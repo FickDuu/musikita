@@ -64,10 +64,10 @@ dependencies:
   url_launcher: ^6.2.5
 
   #File picker (music)
-  file_picker: ^6.1.1
+  #file_picker: ^6.1.1
 
   #audio file info
-  audiotagger: ^2.2.1
+  #audiotagger: ^2.2.1
 
 dev_dependencies:
   flutter_test:

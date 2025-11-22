@@ -6,6 +6,8 @@ import 'package:musikita/core/constants/app_colors.dart';
 class AppTheme {
   AppTheme._();
 
+  static const String artistUsernameFont = 'Docallisme';
+
   static ThemeData get lightTheme {
     return ThemeData(
       useMaterial3: true,
@@ -186,7 +188,7 @@ class AppTheme {
     cardTheme: CardThemeData(
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(16),
       ),
         color: AppColors.surface,
         shadowColor: AppColors.shadow,

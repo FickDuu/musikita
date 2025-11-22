@@ -9,6 +9,8 @@ import 'presentation/splash/splash_screen.dart';
 import 'presentation/welcome/welcome_screen.dart';
 import 'presentation/auth/register/register_screen.dart';
 import 'presentation/auth/login/login_screen.dart';
+import 'presentation/common/main_navigation.dart';
+import 'data/models/user_role.dart';
 
 void main() async {
   // Ensure Flutter bindings are initialized
@@ -54,7 +56,6 @@ final GoRouter _router = GoRouter(
       path: '/welcome',
       builder: (context, state) => const WelcomeScreen(),
     ),
-    // TODO: Add more routes as we build them
     GoRoute(
       path: '/register',
       builder: (context, state) => const RegisterScreen(),
@@ -63,5 +64,6 @@ final GoRouter _router = GoRouter(
       path: '/login',
       builder: (context, state) => const LoginScreen(),
     ),
+    // TODO: Add home screens for musician and organizer
   ],
 );

@@ -10,7 +10,7 @@ class AppStrings {
   static const String welcomeTitle = 'Welcome to Musikita';
   static const String welcomeSubtitle = 'HEHEHEHEHE';
   static const String getStarted = 'Get Started';
-  static const String alreadyHaveAcc = 'Already have an account?';
+  static const String alreadyHaveAccount = 'Already have an account?';
   static const String login = 'Login';
 
   //authentication
@@ -23,7 +23,7 @@ class AppStrings {
   static const String artistName = 'Artist Name';
   static const String organizerName = 'Organizer Name';
   static const String forgotPassword = 'Forgot Password';
-  static const String noAcc = "Don't have an Account?";
+  static const String dontHaveAccount = "Don't have an Account?";
   static const String signUpHere = 'Sign up Here';
 
   //user roles

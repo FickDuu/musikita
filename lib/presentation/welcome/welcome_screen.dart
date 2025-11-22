@@ -76,7 +76,7 @@ class WelcomeScreen extends StatelessWidget {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         Text(
-                          AppStrings.alreadyHaveAcc,
+                          AppStrings.alreadyHaveAccount,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         TextButton(

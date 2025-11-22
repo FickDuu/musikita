@@ -7,69 +7,67 @@ import '../../../core/widgets/app_background.dart';
 import '../../../core/utils/validators.dart';
 import '../../../data/services/auth_service.dart';
 
-class LoginScreen extends StatefulWidget{
+/// Login screen for existing users
+class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
   @override
   State<LoginScreen> createState() => _LoginScreenState();
 }
 
-class _LoginScreenState extends State<LoginScreen>{
+class _LoginScreenState extends State<LoginScreen> {
   final _formKey = GlobalKey<FormState>();
   final _authService = AuthService();
 
+  // Controllers
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
 
+  // State
   bool _isLoading = false;
   bool _obscurePassword = true;
 
   @override
-  void dispose(){
+  void dispose() {
     _emailController.dispose();
     _passwordController.dispose();
     super.dispose();
   }
 
-  Future<void> _handleLogin() async{
-    if(!_formKey.currentState!.validate()) return;
+  Future<void> _handleLogin() async {
+    if (!_formKey.currentState!.validate()) return;
 
     setState(() => _isLoading = true);
 
-    try{
+    try {
       await _authService.signInWithEmailAndPassword(
-          email:_emailController.text.trim(),
-          password: _passwordController.text,
+        email: _emailController.text.trim(),
+        password: _passwordController.text,
       );
 
-      if(mounted){
+      if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text(AppStrings.loginSuccess),
             backgroundColor: AppColors.success,
           ),
         );
-
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Login Successful!'),
-          ),
-        );
+        // Navigate to home screen
+        context.go('/home');
       }
-    }
-    catch(e){
+    } catch (e) {
       _showError(e.toString());
-    }finally{
-      if(mounted){
-        setState(()=>_isLoading =false);
+    } finally {
+      if (mounted) {
+        setState(() => _isLoading = false);
       }
     }
   }
 
-  void _showError(String message){
+  void _showError(String message) {
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(
-        content:Text(message),
+        content: Text(message),
         backgroundColor: AppColors.error,
       ),
     );
@@ -212,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen>{
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        AppStrings.noAcc,
+                        AppStrings.dontHaveAccount,
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       TextButton(
