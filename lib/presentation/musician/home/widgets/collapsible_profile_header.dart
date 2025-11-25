@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
+import '../../../../data/providers/auth_provider.dart';
 
-class CollapsibleProfileHeader extends StatelessWidget{
+/// Collapsible profile header with image, username, and bio
+/// Similar to Spotify artist page header
+class CollapsibleProfileHeader extends StatelessWidget {
   final String userId;
   final String? profileImageUrl;
   final String username;
@@ -17,12 +22,14 @@ class CollapsibleProfileHeader extends StatelessWidget{
   });
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Stack(
       fit: StackFit.expand,
-      children:[
+      children: [
+        // Background Profile Image
         _buildProfileImage(),
 
+        // Gradient Overlay
         Container(
           decoration: BoxDecoration(
             gradient: LinearGradient(
@@ -37,16 +44,17 @@ class CollapsibleProfileHeader extends StatelessWidget{
           ),
         ),
 
-        //username and bio
+        // Username and Bio Overlay
         Positioned(
-          left:24,
-          right:24,
-          bottom:24,
+          left: 24,
+          right: 24,
+          bottom: 24,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
-            children:[
-              Text( //username
+            children: [
+              // Username with custom font
+              Text(
                 username,
                 style: const TextStyle(
                   fontFamily: AppTheme.artistUsernameFont,
@@ -66,7 +74,7 @@ class CollapsibleProfileHeader extends StatelessWidget{
               ),
               const SizedBox(height: 8),
 
-              //bio
+              // Bio
               Text(
                 bio,
                 style: const TextStyle(
@@ -88,37 +96,64 @@ class CollapsibleProfileHeader extends StatelessWidget{
           ),
         ),
 
-        //Edit button
+        // Edit Profile & Logout Buttons (top right)
         Positioned(
-          top:48,
+          top: 48,
           right: 16,
-          child: IconButton(
-            onPressed: (){
-              ScaffoldMessenger.of(context).showSnackBar(
-                const SnackBar(
-                  content: Text('Edit profile'),
+          child: Row(
+            children: [
+              // Logout button
+              IconButton(
+                onPressed: () async {
+                  final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                  await authProvider.signOut();
+                  if (context.mounted) {
+                    context.go('/auth');
+                  }
+                },
+                icon: const Icon(
+                  Icons.logout,
+                  color: AppColors.white,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                 ),
-              );
-            },
-            icon: const Icon(
-              Icons.edit,
-              color: AppColors.white,
-              shadows: [
-                Shadow(
-                  color: Colors.black,
-                  blurRadius: 4,
-                  offset: Offset(0, 2),
+              ),
+              // Edit Profile Button
+              IconButton(
+                onPressed: () {
+                  // TODO: Navigate to edit profile
+                  ScaffoldMessenger.of(context).showSnackBar(
+                    const SnackBar(
+                      content: Text('Edit profile coming soon!'),
+                    ),
+                  );
+                },
+                icon: const Icon(
+                  Icons.edit,
+                  color: AppColors.white,
+                  shadows: [
+                    Shadow(
+                      color: Colors.black,
+                      blurRadius: 4,
+                      offset: Offset(0, 2),
+                    ),
+                  ],
                 ),
-              ],
-            ),
+              ),
+            ],
           ),
         ),
       ],
     );
   }
 
-  Widget _buildProfileImage(){
-    if(profileImageUrl != null && profileImageUrl!.isNotEmpty){
+  Widget _buildProfileImage() {
+    if (profileImageUrl != null && profileImageUrl!.isNotEmpty) {
       return Image.network(
         profileImageUrl!,
         fit: BoxFit.cover,

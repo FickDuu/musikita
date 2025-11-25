@@ -66,8 +66,8 @@ class _RegisterScreenState extends State<RegisterScreen> {
             duration: const Duration(seconds: 2),
           ),
         );
-        // Navigate to home screen
-        context.go('/home');
+        // Navigate to auth gate (will redirect to home)
+        context.go('/auth');
       }
     } on Exception catch (e) {
       if (mounted) {

@@ -1,16 +1,19 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:firebase_core/firebase_core.dart';
+import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/constants/app_strings.dart';
+import 'data/providers/auth_provider.dart';
+import 'data/models/user_role.dart';
 import 'presentation/splash/splash_screen.dart';
 import 'presentation/welcome/welcome_screen.dart';
+import 'presentation/auth/auth_gate.dart';
 import 'presentation/auth/register/register_screen.dart';
 import 'presentation/auth/login/login_screen.dart';
 import 'presentation/common/main_navigation.dart';
-import 'data/models/user_role.dart';
 
 void main() async {
   // Ensure Flutter bindings are initialized
@@ -27,7 +30,14 @@ void main() async {
     options: DefaultFirebaseOptions.currentPlatform,
   );
 
-  runApp(const MyApp());
+  runApp(
+    MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => AuthProvider()),
+      ],
+      child: const MyApp(),
+    ),
+  );
 }
 
 class MyApp extends StatelessWidget {
@@ -53,8 +63,8 @@ final GoRouter _router = GoRouter(
       builder: (context, state) => const SplashScreen(),
     ),
     GoRoute(
-      path: '/welcome',
-      builder: (context, state) => const WelcomeScreen(),
+      path: '/auth',
+      builder: (context, state) => const AuthGate(),
     ),
     GoRoute(
       path: '/register',
@@ -63,15 +73,6 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginScreen(),
-    ),
-    GoRoute(
-      path: '/home',
-      builder: (context, state) {
-        return const MainNavigation(
-          userRole: UserRole.musician,
-          userId: 'demo_user_id',
-        );
-      },
     ),
   ],
 );

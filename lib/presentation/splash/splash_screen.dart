@@ -1,58 +1,54 @@
-//splash screen == initial loading screen when app launch
-
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/constants/app_colors.dart';
 
-
-class SplashScreen extends StatefulWidget{
+/// Splash screen displayed on app launch
+/// Shows the MUSIKITA logo with a fade-in animation
+class SplashScreen extends StatefulWidget {
   const SplashScreen({super.key});
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
 }
 
-class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderStateMixin {
+class _SplashScreenState extends State<SplashScreen>
+    with SingleTickerProviderStateMixin {
   late AnimationController _controller;
   late Animation<double> _fadeAnimation;
 
   @override
-  void initState(){
+  void initState() {
     super.initState();
 
+    // Initialize fade animation
     _controller = AnimationController(
       duration: const Duration(milliseconds: 1500),
       vsync: this,
     );
 
-    _fadeAnimation = Tween<double>(
-        begin: 0.0,
-        end: 1.0).animate(
-      CurvedAnimation(
-        parent: _controller,
-        curve: Curves.easeIn
-      ),
+    _fadeAnimation = Tween<double>(begin: 0.0, end: 1.0).animate(
+      CurvedAnimation(parent: _controller, curve: Curves.easeIn),
     );
 
     _controller.forward();
 
-    //navigate to welcome screen
-    Future.delayed(const Duration(seconds: 3), (){
+    // Navigate to auth gate after 3 seconds
+    Future.delayed(const Duration(seconds: 3), () {
       if (mounted) {
-        context.go('/welcome');
+        context.go('/auth');
       }
     });
   }
 
   @override
-  void dispose(){
+  void dispose() {
     _controller.dispose();
     super.dispose();
   }
 
   @override
-  Widget build(BuildContext context){
+  Widget build(BuildContext context) {
     return Scaffold(
       backgroundColor: AppColors.primary,
       body: Center(
@@ -61,14 +57,14 @@ class _SplashScreenState extends State<SplashScreen> with SingleTickerProviderSt
           child: Column(
             mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              //logo
+              // Logo
               Image.asset(
                 AppAssets.logo,
                 width: MediaQuery.of(context).size.width * 0.7,
                 fit: BoxFit.contain,
               ),
               const SizedBox(height: 24),
-              //Loading indicator
+              // Loading indicator
               const CircularProgressIndicator(
                 color: AppColors.white,
                 strokeWidth: 3,

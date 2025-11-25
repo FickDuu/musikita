@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
-import '../../../../core/constants/app_colors.dart';
-import '../../../../core/theme/app_theme.dart';
-import '../../../../core/widgets/app_background.dart';
-import 'collapsible_profile_header.dart';
-import 'middle_navbar.dart';
-import 'music_tab.dart';
-import 'calendar_tab.dart';
-import 'analytics_tab.dart';
+import 'package:provider/provider.dart';
+import '/core/constants/app_colors.dart';
+import '/core/theme/app_theme.dart';
+import '/core/widgets/app_background.dart';
+import '/data/providers/auth_provider.dart';
+import '../widgets/collapsible_profile_header.dart';
+import '../widgets/middle_navbar.dart';
+import '../widgets/music_tab.dart';
+import '../widgets/calendar_tab.dart';
+import '../widgets/analytics_tab.dart';
 
-//musician home profile screen
-class MusicianHomeScreen extends StatefulWidget{
+/// Musician home/profile screen
+/// Shows profile header, middle navbar with tabs, and content
+class MusicianHomeScreen extends StatefulWidget {
   final String userId;
 
   const MusicianHomeScreen({
@@ -17,13 +20,16 @@ class MusicianHomeScreen extends StatefulWidget{
     required this.userId,
   });
 
-  @override State<MusicianHomeScreen> createState() => _MusicianHomeScreenState();
+  @override
+  State<MusicianHomeScreen> createState() => _MusicianHomeScreenState();
 }
 
-class _MusicianHomeScreenState extends State<MusicianHomeScreen> with SingleTickerProviderStateMixin {
+class _MusicianHomeScreenState extends State<MusicianHomeScreen>
+    with SingleTickerProviderStateMixin {
   late ScrollController _scrollController;
   late TabController _tabController;
 
+  // Header collapse tracking
   bool _isHeaderCollapsed = false;
   static const double _collapseThreshold = 200.0;
 
@@ -34,7 +40,8 @@ class _MusicianHomeScreenState extends State<MusicianHomeScreen> with SingleTick
     _tabController = TabController(length: 3, vsync: this);
   }
 
-  @override void dispose() {
+  @override
+  void dispose() {
     _scrollController.dispose();
     _tabController.dispose();
     super.dispose();
@@ -49,13 +56,15 @@ class _MusicianHomeScreenState extends State<MusicianHomeScreen> with SingleTick
 
   @override
   Widget build(BuildContext context) {
+    final authProvider = Provider.of<AuthProvider>(context);
+    final appUser = authProvider.appUser;
+
     return Scaffold(
       body: AppBackground(
         child: NestedScrollView(
           controller: _scrollController,
           headerSliverBuilder: (context, innerBoxIsScrolled) {
             return [
-
               // Collapsible Profile Header
               SliverAppBar(
                 expandedHeight: 300,
@@ -65,16 +74,17 @@ class _MusicianHomeScreenState extends State<MusicianHomeScreen> with SingleTick
                 flexibleSpace: FlexibleSpaceBar(
                   background: CollapsibleProfileHeader(
                     userId: widget.userId,
-
-                    // TODO: Replace with actual data from Firebase
-                    profileImageUrl: null,
-                    username: 'Artist Name',
-                    bio:'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
+                    profileImageUrl: appUser?.profileImageUrl,
+                    username: appUser?.username ?? 'Artist Name',
+                    bio: appUser?.username != null
+                        ? 'Welcome to my profile! Book me for your next event.'
+                        : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
                         'Vestibulum viverra sapien at eleifend scelerisque.',
                   ),
                   titlePadding: EdgeInsets.zero,
-                  title: _isHeaderCollapsed ? Text(
-                    'Artist Name', // TODO: Replace with actual username
+                  title: _isHeaderCollapsed
+                      ? Text(
+                    appUser?.username ?? 'Artist Name',
                     style: TextStyle(
                       fontFamily: AppTheme.artistUsernameFont,
                       fontSize: 20,
@@ -86,7 +96,7 @@ class _MusicianHomeScreenState extends State<MusicianHomeScreen> with SingleTick
                 ),
               ),
 
-              // middle navbar
+              // Middle Navbar (Tabs)
               SliverPersistentHeader(
                 pinned: true,
                 delegate: _SliverAppBarDelegate(
@@ -95,7 +105,7 @@ class _MusicianHomeScreenState extends State<MusicianHomeScreen> with SingleTick
                     indicatorColor: Colors.transparent,
                     labelColor: AppColors.primary,
                     unselectedLabelColor: AppColors.grey,
-                    tabs: const[
+                    tabs: const [
                       Tab(icon: Icon(Icons.music_note, size: 28)),
                       Tab(icon: Icon(Icons.calendar_today, size: 28)),
                       Tab(icon: Icon(Icons.analytics, size: 28)),
@@ -119,8 +129,8 @@ class _MusicianHomeScreenState extends State<MusicianHomeScreen> with SingleTick
   }
 }
 
-//
-class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate{
+/// Custom delegate for pinned tab bar
+class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
   final TabBar _tabBar;
 
   _SliverAppBarDelegate(this._tabBar);
@@ -134,10 +144,10 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate{
   @override
   Widget build(
       BuildContext context,
-      double shinkOffset,
+      double shrinkOffset,
       bool overlapsContent,
       ) {
-    return Container (
+    return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
         boxShadow: [
@@ -153,7 +163,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate{
   }
 
   @override
-  bool shouldRebuild(_SliverAppBarDelegate oldDelegate){
+  bool shouldRebuild(_SliverAppBarDelegate oldDelegate) {
     return false;
   }
 }
