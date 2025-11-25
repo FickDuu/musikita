@@ -40,8 +40,9 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
   Future<void> _pickAudioFile() async {
     try {
       final result = await FilePicker.platform.pickFiles(
-        type: FileType.audio,
+        type: FileType.custom,
         allowedExtensions: ['mp3'],
+        allowMultiple: false,
       );
 
       if (result != null && result.files.single.path != null) {
