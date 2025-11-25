@@ -126,12 +126,7 @@ class CollapsibleProfileHeader extends StatelessWidget {
               // Edit Profile Button
               IconButton(
                 onPressed: () {
-                  // TODO: Navigate to edit profile
-                  ScaffoldMessenger.of(context).showSnackBar(
-                    const SnackBar(
-                      content: Text('Edit profile coming soon!'),
-                    ),
-                  );
+                  context.push('/edit-profile');
                 },
                 icon: const Icon(
                   Icons.edit,

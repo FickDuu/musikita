@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '/core/constants/app_colors.dart';
-import '/core/theme/app_theme.dart';
-import '/core/widgets/app_background.dart';
-import '/data/providers/auth_provider.dart';
+import '/../../core/constants/app_colors.dart';
+import '/../../core/theme/app_theme.dart';
+import '/../../core/widgets/app_background.dart';
+import '/../../data/providers/auth_provider.dart';
+import '/../../data/services/profile_service.dart';
 import '../widgets/collapsible_profile_header.dart';
 import '../widgets/middle_navbar.dart';
 import '../widgets/music_tab.dart';
@@ -28,16 +29,28 @@ class _MusicianHomeScreenState extends State<MusicianHomeScreen>
     with SingleTickerProviderStateMixin {
   late ScrollController _scrollController;
   late TabController _tabController;
+  final _profileService = ProfileService();
 
   // Header collapse tracking
   bool _isHeaderCollapsed = false;
   static const double _collapseThreshold = 200.0;
+  String? _bio;
 
   @override
   void initState() {
     super.initState();
     _scrollController = ScrollController()..addListener(_onScroll);
     _tabController = TabController(length: 3, vsync: this);
+    _loadBio();
+  }
+
+  Future<void> _loadBio() async {
+    final bio = await _profileService.getMusicianBio(widget.userId);
+    if (mounted) {
+      setState(() {
+        _bio = bio;
+      });
+    }
   }
 
   @override
@@ -76,10 +89,7 @@ class _MusicianHomeScreenState extends State<MusicianHomeScreen>
                     userId: widget.userId,
                     profileImageUrl: appUser?.profileImageUrl,
                     username: appUser?.username ?? 'Artist Name',
-                    bio: appUser?.username != null
-                        ? 'Welcome to my profile! Book me for your next event.'
-                        : 'Lorem ipsum dolor sit amet, consectetur adipiscing elit. '
-                        'Vestibulum viverra sapien at eleifend scelerisque.',
+                    bio: _bio ?? 'Welcome to my profile! Book me for your next event.',
                   ),
                   titlePadding: EdgeInsets.zero,
                   title: _isHeaderCollapsed

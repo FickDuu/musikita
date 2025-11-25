@@ -7,13 +7,11 @@ import 'firebase_options.dart';
 import 'core/theme/app_theme.dart';
 import 'core/constants/app_strings.dart';
 import 'data/providers/auth_provider.dart';
-import 'data/models/user_role.dart';
 import 'presentation/splash/splash_screen.dart';
-import 'presentation/welcome/welcome_screen.dart';
 import 'presentation/auth/auth_gate.dart';
 import 'presentation/auth/register/register_screen.dart';
 import 'presentation/auth/login/login_screen.dart';
-import 'presentation/common/main_navigation.dart';
+import 'presentation/musician/profile/edit_profile_screen.dart';
 
 void main() async {
   // Ensure Flutter bindings are initialized
@@ -73,6 +71,10 @@ final GoRouter _router = GoRouter(
     GoRoute(
       path: '/login',
       builder: (context, state) => const LoginScreen(),
+    ),
+    GoRoute(
+      path: '/edit-profile',
+      builder: (context, state) => const EditProfileScreen(),
     ),
   ],
 );
