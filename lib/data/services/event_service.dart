@@ -246,9 +246,11 @@ class EventService {
   //cancel application
   Future<void> cancelApplication(String applicationId) async{
     try {
-      await _firestore.collection('event_applications').doc(applicationId).update({
-        'status': 'cancelled',
-      });
+      await _firestore.collection('event_applications').doc(applicationId).delete();
+      // {
+      //   'status': 'cancelled',
+      //   'respondedAt' : FieldValue.serverTimestamp(),
+      // });
     } catch (e) {
       throw Exception('Failed to cancel application: $e');
     }
@@ -294,39 +296,84 @@ class EventService {
   }
 
   // Get events that musician has NOT applied to
-  Future<List<Event>> getUnappliedEvents(String musicianId) async {
-    try {
-      // Get all applications for this musician
-      final applications = await _firestore
-          .collection('event_applications')
-          .where('musicianId', isEqualTo: musicianId)
-          .get();
+  Future<List<Event>> getUnappliedEvents(
+    String musicianId, {
+      DateTime? startDate,
+      DateTime? endDate,
+      double? maxDistance,
+      double? userLatitude,
+      double? userLongitude,
+    }) async{
+    try{
+      Query query = _firestore.collection('events').where('status', isEqualTo: 'open');
+      if(startDate != null){
+        query = query.where('eventDate', isGreaterThanOrEqualTo: startDate);
+      }
+      if(endDate != null){
+        query = query.where('eventDate', isLessThanOrEqualTo: endDate);
+      }
 
-      final appliedEventIds = applications.docs
-          .map((doc) => doc.data()['eventId'] as String)
-          .toSet();
-
-      // Get all available events
-      final allEvents = await _firestore
-          .collection('events')
-          .where('status', isEqualTo: 'open')
-          .where('eventDate',
-          isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime.now()))
-          .get();
-
-      // Filter out applied events
-      final unappliedEvents = allEvents.docs
-          .map((doc) => Event.fromJson(doc.data()))
-          .where((event) =>
-      !appliedEventIds.contains(event.id) && event.isAvailable)
+      final eventsSnapshot = await query.get();
+      final events = eventsSnapshot
+          .docs.map((doc) => Event.fromJson({...doc.data() as Map<String, dynamic>, 'id': doc.id}))
           .toList();
 
-      // Sort by date
-      unappliedEvents.sort((a, b) => a.eventDate.compareTo(b.eventDate));
+      final applicationsSnapshot = await _firestore
+          .collection('event_applications')
+          .where('musicianId', isEqualTo: musicianId)
+          .where('status', whereIn: ['pending', 'accepted'])
+          .get();
 
-      return unappliedEvents;
+      final appliedEventIds = applicationsSnapshot.docs
+        .map((doc) => doc.data()['eventId'] as String)
+        .toSet();
+
+      var filteredEvents = events.where((event) => !appliedEventIds.contains(event.id)).toList();
+
+      // Check for time clashes with accepted events
+      final acceptedEventsSnapshot = await _firestore
+          .collection('event_applications')
+          .where('musicianId', isEqualTo: musicianId)
+          .where('status', isEqualTo: 'accepted')
+          .get();
+
+      final acceptedEventIds = acceptedEventsSnapshot.docs
+          .map((doc) => doc.data()['eventId'] as String)
+          .toList();
+
+      final acceptedEvents = await Future.wait(
+        acceptedEventIds.map((id) => getEventById(id)),
+      );
+
+      final validAcceptedEvents = acceptedEvents.whereType<Event>().toList();
+
+      // Filter out events that clash with accepted events
+      filteredEvents = filteredEvents.where((event) {
+        return !_hasTimeClash(event, validAcceptedEvents);
+      }).toList();
+
+      // Sort by date
+      filteredEvents.sort((a, b) => a.eventDate.compareTo(b.eventDate));
+
+      return filteredEvents;
     } catch (e) {
       throw Exception('Error getting unapplied events: $e');
     }
+  }
+
+  bool _hasTimeClash(Event newEvent, List<Event> acceptedEvents){
+    for (final acceptedEvent in acceptedEvents){
+      if(_isSameDate(newEvent.eventDate, acceptedEvent.eventDate)){
+        if(_timesOverlap(
+          newEvent.startTime,
+          newEvent.endTime,
+          acceptedEvent.startTime,
+          acceptedEvent.endTime,
+        )){
+          return true;
+        }
+      }
+    }
+    return false;
   }
 }

@@ -38,10 +38,16 @@ dependencies:
   #Calendar
   table_calendar: ^3.0.9
 
-  #URL Launcher (Google Maps)
+  #Google maps
+  google_maps_flutter: ^2.5.0
+  google_maps_webservice: ^0.0.20-nullsafety.5
+  flutter_google_places: ^0.3.0
+  geolocator: ^10.1.0
+
+  #URL Launcher
   url_launcher: ^6.2.5
 
-  #File picker (music) - ENABLED
+  #File picker
   file_picker: ^8.1.4
 
 dev_dependencies:
