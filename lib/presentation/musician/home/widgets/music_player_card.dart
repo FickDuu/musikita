@@ -3,6 +3,10 @@ import 'package:just_audio/just_audio.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../data/models/music_post.dart';
+import '../../../../data/models/musician.dart';
+import '../../../../data/services/musician_discovery_service.dart';
+import '../../../common/widgets/artist_info_bottom_sheet.dart';
+import '../../profile/musician_profile_screen.dart';
 
 /// Music player widget with play/pause and progress bar
 /// Displays a single music post with playback controls
@@ -10,12 +14,16 @@ class MusicPlayerCard extends StatefulWidget {
   final MusicPost musicPost;
   final VoidCallback? onDelete;
   final VoidCallback? onEdit;
+  final VoidCallback? onArtistTap; // Optional custom artist tap handler
+  final bool showArtistName; // Show artist name or not (default: false for own music)
 
   const MusicPlayerCard({
     super.key,
     required this.musicPost,
     this.onDelete,
     this.onEdit,
+    this.onArtistTap,
+    this.showArtistName = false,
   });
 
   @override
@@ -28,6 +36,8 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
   bool _isLoading = false;
   Duration _duration = Duration.zero;
   Duration _position = Duration.zero;
+
+  final _musicianService = MusicianDiscoveryService();
 
   @override
   void initState() {
@@ -137,6 +147,85 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
     }
   }
 
+  /// Handle artist name tap - fetch musician and show bottom sheet
+  Future<void> _handleArtistTap() async {
+    // If custom handler provided, use it
+    if (widget.onArtistTap != null) {
+      widget.onArtistTap!();
+      return;
+    }
+
+    // Otherwise, fetch musician and show bottom sheet
+    try {
+      // Show loading
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Row(
+              children: [
+                SizedBox(
+                  width: 16,
+                  height: 16,
+                  child: CircularProgressIndicator(
+                    strokeWidth: 2,
+                    color: Colors.white,
+                  ),
+                ),
+                SizedBox(width: 12),
+                Text('Loading artist info...'),
+              ],
+            ),
+            duration: Duration(seconds: 1),
+          ),
+        );
+      }
+
+      // Fetch musician data
+      final musician = await _musicianService.getMusicianById(widget.musicPost.userId);
+
+      if (musician == null) {
+        if (mounted) {
+          ScaffoldMessenger.of(context).showSnackBar(
+            const SnackBar(
+              content: Text('Could not load artist information'),
+              backgroundColor: AppColors.error,
+            ),
+          );
+        }
+        return;
+      }
+
+      // Show bottom sheet
+      if (mounted) {
+        ArtistInfoBottomSheet.show(
+          context,
+          musician: musician,
+          onViewProfile: () {
+            // Navigate to full profile screen
+            Navigator.push(
+              context,
+              MaterialPageRoute(
+                builder: (context) => MusicianProfileScreen(
+                  musicianId: widget.musicPost.userId,
+                  musician: musician, // Pass loaded musician to avoid re-fetching
+                ),
+              ),
+            );
+          },
+        );
+      }
+    } catch (e) {
+      if (mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(
+            content: Text('Error loading artist: $e'),
+            backgroundColor: AppColors.error,
+          ),
+        );
+      }
+    }
+  }
+
   void _showOptionsMenu() {
     showModalBottomSheet(
       context: context,
@@ -229,6 +318,40 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
                     ),
                     const SizedBox(height: 4),
 
+                    // Artist name (tappable) - only show if showArtistName is true
+                    if (widget.showArtistName) ...[
+                      GestureDetector(
+                        onTap: _handleArtistTap,
+                        child: Row(
+                          mainAxisSize: MainAxisSize.min,
+                          children: [
+                            Flexible(
+                              child: Text(
+                                musicPost.artistName,
+                                style: Theme.of(context)
+                                    .textTheme
+                                    .bodyMedium
+                                    ?.copyWith(
+                                  color: AppColors.primary,
+                                  fontWeight: FontWeight.w500,
+                                  decoration: TextDecoration.underline,
+                                ),
+                                maxLines: 1,
+                                overflow: TextOverflow.ellipsis,
+                              ),
+                            ),
+                            const SizedBox(width: 4),
+                            const Icon(
+                              Icons.info_outline,
+                              size: 14,
+                              color: AppColors.primary,
+                            ),
+                          ],
+                        ),
+                      ),
+                      const SizedBox(height: 4),
+                    ],
+
                     // Genre and upload date
                     Row(
                       children: [
@@ -268,13 +391,14 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
                 ),
               ),
 
-              // Options menu button
-              IconButton(
-                icon: const Icon(Icons.more_vert, color: AppColors.grey),
-                onPressed: _showOptionsMenu,
-                padding: EdgeInsets.zero,
-                constraints: const BoxConstraints(),
-              ),
+              // Options menu button (only show if onDelete or onEdit provided)
+              if (widget.onDelete != null || widget.onEdit != null)
+                IconButton(
+                  icon: const Icon(Icons.more_vert, color: AppColors.grey),
+                  onPressed: _showOptionsMenu,
+                  padding: EdgeInsets.zero,
+                  constraints: const BoxConstraints(),
+                ),
             ],
           ),
 
@@ -285,7 +409,7 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
             children: [
               // Play/Pause button
               Container(
-                decoration: BoxDecoration(
+                decoration: const BoxDecoration(
                   color: AppColors.primary,
                   shape: BoxShape.circle,
                 ),

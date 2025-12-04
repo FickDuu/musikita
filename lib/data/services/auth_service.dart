@@ -45,18 +45,36 @@ class AuthService {
       // Save to Firestore - users collection
       await _firestore.collection('users').doc(user.uid).set(appUser.toJson());
 
-      // Create role-specific document
+      // Create role-specific document with all required fields
+      final now = DateTime.now();
+
       if (role == UserRole.musician) {
+        // ✅ FIXED: Create complete musician document
         await _firestore.collection('musicians').doc(user.uid).set({
-          'uid': user.uid,
-          'createdAt': Timestamp.now(),
-          // Additional musician fields will be added during profile setup
+          'id': user.uid,
+          'userId': user.uid,
+          'artistName': username,  // Use registration username as initial artist name
+          'bio': 'Welcome to my profile! Edit this to tell people about yourself.',
+          'profileImageUrl': null,
+          'genres': [],  // Empty initially, user can add later
+          'experience': null,
+          'location': null,
+          'contactNumber': null,
+          'createdAt': Timestamp.fromDate(now),
+          'updatedAt': Timestamp.fromDate(now),
         });
       } else {
+        // Create organizer document
         await _firestore.collection('organizers').doc(user.uid).set({
-          'uid': user.uid,
-          'createdAt': Timestamp.now(),
-          // Additional organizer fields will be added during profile setup
+          'id': user.uid,
+          'userId': user.uid,
+          'organizerName': username,
+          'companyName': null,
+          'businessType': null,
+          'location': null,
+          'contactNumber': null,
+          'createdAt': Timestamp.fromDate(now),
+          'updatedAt': Timestamp.fromDate(now),
         });
       }
 
