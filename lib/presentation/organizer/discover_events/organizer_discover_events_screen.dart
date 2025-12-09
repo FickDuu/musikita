@@ -1,47 +1,46 @@
 import 'package:flutter/material.dart';
-import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_background.dart';
-import '../../../data/models/music_post.dart';
-import '../home/widgets/music_player_card.dart';
+import '../../../data/models/event.dart';
+import '../../../data/services/event_service.dart';
+import 'widgets/organizer_event_card.dart';
 
-/// Discover music screen - Browse music from all musicians
-class DiscoverMusicScreen extends StatefulWidget {
+/// Organizer's Discover Events screen
+/// Shows ALL events from ALL organizers (not filtered)
+/// Allows organizers to see what other organizers are posting
+class OrganizerDiscoverEventsScreen extends StatefulWidget {
   final String userId;
 
-  const DiscoverMusicScreen({
+  const OrganizerDiscoverEventsScreen({
     super.key,
     required this.userId,
   });
 
   @override
-  State<DiscoverMusicScreen> createState() => _DiscoverMusicScreenState();
+  State<OrganizerDiscoverEventsScreen> createState() =>
+      _OrganizerDiscoverEventsScreenState();
 }
 
-class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
-  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+class _OrganizerDiscoverEventsScreenState
+    extends State<OrganizerDiscoverEventsScreen> {
+  final _eventService = EventService();
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Discover Music'),
+        title: const Text('Discover Events'),
         automaticallyImplyLeading: false,
       ),
       body: AppBackground(
-        child: _buildMusicFeed(),
+        child: _buildEventsList(),
       ),
     );
   }
 
-  Widget _buildMusicFeed() {
-    return StreamBuilder<QuerySnapshot>(
-      stream: _firestore
-          .collection('music_posts')
-          .where('userId', isNotEqualTo: widget.userId) // Exclude own music
-          .orderBy('userId') // Required for isNotEqualTo
-          .orderBy('uploadedAt', descending: true)
-          .snapshots(),
+  Widget _buildEventsList() {
+    return StreamBuilder<List<Event>>(
+      stream: _eventService.getAvailableEvents(),
       builder: (context, snapshot) {
         // Loading state
         if (snapshot.connectionState == ConnectionState.waiting) {
@@ -68,7 +67,7 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
                   ),
                   const SizedBox(height: 16),
                   Text(
-                    'Error loading music',
+                    'Error loading events',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: AppColors.error,
                     ),
@@ -90,22 +89,10 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
           );
         }
 
-        // Parse music posts
-        final musicPosts = snapshot.data!.docs.map((doc) {
-          try {
-            final data = doc.data() as Map<String, dynamic>;
-            return MusicPost.fromJson({
-              ...data,
-              'id': doc.id,
-            });
-          } catch (e) {
-            print('Error parsing music post ${doc.id}: $e');
-            return null;
-          }
-        }).whereType<MusicPost>().toList();
+        final events = snapshot.data ?? [];
 
         // Empty state
-        if (musicPosts.isEmpty) {
+        if (events.isEmpty) {
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(32.0),
@@ -113,18 +100,18 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   Icon(
-                    Icons.music_note,
+                    Icons.event_busy,
                     size: 80,
                     color: AppColors.grey.withValues(alpha: 0.5),
                   ),
                   const SizedBox(height: 24),
                   Text(
-                    'No Music Yet',
+                    'No events available',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Be the first to share your music!\nOther musicians\' posts will appear here.',
+                    'Events from organizers will appear here',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -136,7 +123,7 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
           );
         }
 
-        // Music feed
+        // Events list
         return RefreshIndicator(
           onRefresh: () async {
             setState(() {});
@@ -145,15 +132,14 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
           color: AppColors.primary,
           child: ListView.builder(
             padding: const EdgeInsets.all(16),
-            itemCount: musicPosts.length,
+            itemCount: events.length,
             itemBuilder: (context, index) {
-              final post = musicPosts[index];
+              final event = events[index];
               return Padding(
                 padding: const EdgeInsets.only(bottom: 16),
-                child: MusicPlayerCard(
-                  musicPost: post,
-                  showArtistName: true, // Show artist name for discovery
-                  // No onDelete or onEdit = no options menu
+                child: OrganizerEventCard(
+                  event: event,
+                  currentUserId: widget.userId,
                 ),
               );
             },

@@ -206,7 +206,11 @@ class _CalendarTabState extends State<CalendarTab> {
         }
 
         if (snapshot.hasError) {
-          return _buildErrorState();
+          return _buildEmptyState(
+            icon: Icons.event_available,
+            message: 'No confirmed events',
+            subtitle: 'This musician\'s confirmed events will appear here',
+          );
         }
 
         final applications = snapshot.data ?? [];
@@ -311,7 +315,11 @@ class _CalendarTabState extends State<CalendarTab> {
           return _buildLoadingState();
         }
         if (snapshot.hasError) {
-          return _buildErrorState();
+          return _buildEmptyState(
+            icon: Icons.history,
+            message: 'No past events',
+            subtitle: 'This musician\'s past events will appear here',
+          );
         }
         final allApplications = snapshot.data ?? [];
         final now = DateTime.now();

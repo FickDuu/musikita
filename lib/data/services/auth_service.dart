@@ -3,18 +3,18 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/app_user.dart';
 import '../models/user_role.dart';
 
-/// Authentication service for Firebase Auth operations
+// Authentication service for Firebase Auth operations
 class AuthService {
   final FirebaseAuth _auth = FirebaseAuth.instance;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
-  /// Get current user stream
+  // Get current user stream
   Stream<User?> get authStateChanges => _auth.authStateChanges();
 
-  /// Get current user
+  // Get current user
   User? get currentUser => _auth.currentUser;
 
-  /// Register new user with email and password
+  // Register new user with email and password
   Future<AppUser> registerWithEmailAndPassword({
     required String email,
     required String password,
@@ -49,7 +49,6 @@ class AuthService {
       final now = DateTime.now();
 
       if (role == UserRole.musician) {
-        // ✅ FIXED: Create complete musician document
         await _firestore.collection('musicians').doc(user.uid).set({
           'id': user.uid,
           'userId': user.uid,
@@ -69,10 +68,12 @@ class AuthService {
           'id': user.uid,
           'userId': user.uid,
           'organizerName': username,
+          'bio': 'Welcome! We organize evets. Contact us to book',
           'companyName': null,
           'businessType': null,
           'location': null,
           'contactNumber': null,
+          'profileImageUrl': null,
           'createdAt': Timestamp.fromDate(now),
           'updatedAt': Timestamp.fromDate(now),
         });
@@ -88,7 +89,7 @@ class AuthService {
     }
   }
 
-  /// Sign in with email and password
+  // Sign in with email and password
   Future<AppUser> signInWithEmailAndPassword({
     required String email,
     required String password,
@@ -127,7 +128,7 @@ class AuthService {
     }
   }
 
-  /// Sign out
+  // Sign out
   Future<void> signOut() async {
     try {
       await _auth.signOut();
@@ -136,7 +137,7 @@ class AuthService {
     }
   }
 
-  /// Get user data from Firestore
+  // Get user data from Firestore
   Future<AppUser?> getUserData(String uid) async {
     try {
       final doc = await _firestore.collection('users').doc(uid).get();

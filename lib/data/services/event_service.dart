@@ -78,7 +78,7 @@ class EventService {
         throw Exception('You have already applied to this event');
       }
 
-      //check time clas
+      //check time clash
       final event = await getEventById(eventId);
       if (event == null) {
         throw Exception('Event not found');
@@ -148,11 +148,11 @@ class EventService {
           .where('status', isEqualTo: 'accepted')
           .get();
 
-      //check each accpeted application for time clash
+      //check each accepted application for time clash
       for (var appDoc in applications.docs){
         final app = EventApplication.fromJson(appDoc.data());
 
-        //get event deets
+        //get event details
         final event = await getEventById(app.eventId);
         if(event == null) continue;
 
@@ -248,10 +248,6 @@ class EventService {
   Future<void> cancelApplication(String applicationId) async{
     try {
       await _firestore.collection('event_applications').doc(applicationId).delete();
-      // {
-      //   'status': 'cancelled',
-      //   'respondedAt' : FieldValue.serverTimestamp(),
-      // });
     } catch (e) {
       throw Exception('Failed to cancel application: $e');
     }
@@ -429,6 +425,124 @@ class EventService {
       filteredEvents.sort((a, b) => a.eventDate.compareTo(b.eventDate));
 
       return filteredEvents;
+    });
+  }
+
+  // ========== ORGANIZER METHODS ==========
+
+  /// Get all events created by organizer
+  Stream<List<Event>> getOrganizerEvents(String organizerId) {
+    return _firestore
+        .collection('events')
+        .where('organizerId', isEqualTo: organizerId)
+        .orderBy('eventDate', descending: false)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+        .map((doc) => Event.fromJson(doc.data()))
+        .toList());
+  }
+
+  /// Update an existing event
+  Future<void> updateEvent(Event event) async {
+    try {
+      await _firestore.collection('events').doc(event.id).update(event.toJson());
+    } catch (e) {
+      throw Exception('Failed to update event: $e');
+    }
+  }
+
+  /// Delete an event (also deletes all applications)
+  Future<void> deleteEvent(String eventId) async {
+    try {
+      // Delete all applications for this event
+      final applications = await _firestore
+          .collection('event_applications')
+          .where('eventId', isEqualTo: eventId)
+          .get();
+
+      for (var doc in applications.docs) {
+        await doc.reference.delete();
+      }
+
+      // Delete the event
+      await _firestore.collection('events').doc(eventId).delete();
+    } catch (e) {
+      throw Exception('Failed to delete event: $e');
+    }
+  }
+
+  /// Get all applications for a specific event
+  Stream<List<EventApplication>> getEventApplications(String eventId) {
+    return _firestore
+        .collection('event_applications')
+        .where('eventId', isEqualTo: eventId)
+        .orderBy('appliedAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+        .map((doc) => EventApplication.fromJson(doc.data()))
+        .toList());
+  }
+
+  /// Get all applications for all organizer's events
+  Stream<List<EventApplication>> getOrganizerApplications(String organizerId) {
+    return _firestore
+        .collection('event_applications')
+        .where('organizerId', isEqualTo: organizerId)
+        .orderBy('appliedAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+        .map((doc) => EventApplication.fromJson(doc.data()))
+        .toList());
+  }
+
+  /// Get pending applications for organizer
+  Stream<List<EventApplication>> getOrganizerPendingApplications(String organizerId) {
+    return _firestore
+        .collection('event_applications')
+        .where('organizerId', isEqualTo: organizerId)
+        .where('status', isEqualTo: 'pending')
+        .orderBy('appliedAt', descending: true)
+        .snapshots()
+        .map((snapshot) => snapshot.docs
+        .map((doc) => EventApplication.fromJson(doc.data()))
+        .toList());
+  }
+
+  /// Accept an application
+  Future<void> acceptApplication(String applicationId, String eventId) async {
+    try {
+      await updateApplicationStatus(
+        applicationId: applicationId,
+        status: 'accepted',
+      );
+    } catch (e) {
+      throw Exception('Failed to accept application: $e');
+    }
+  }
+
+  /// Reject an application with optional reason
+  Future<void> rejectApplication(String applicationId, String eventId, String? reason) async {
+    try {
+      await updateApplicationStatus(
+        applicationId: applicationId,
+        status: 'rejected',
+        rejectionReason: reason,
+      );
+    } catch (e) {
+      throw Exception('Failed to reject application: $e');
+    }
+  }
+
+  Stream<List<EventApplication>> getOrganizerApplicationsStream(String organizerId) {
+    return _firestore
+        .collection('event_applications')
+        .where('organizerId', isEqualTo: organizerId)
+        .orderBy('appliedAt', descending: true)
+        .snapshots()
+        .map((snapshot){
+      return snapshot.docs
+          .map((doc) => EventApplication.fromJson(doc.data()))
+          .toList();
     });
   }
 }

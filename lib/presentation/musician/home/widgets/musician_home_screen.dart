@@ -84,25 +84,23 @@ class _MusicianHomeScreenState extends State<MusicianHomeScreen>
                 floating: false,
                 pinned: true,
                 backgroundColor: AppColors.primary,
-                flexibleSpace: FlexibleSpaceBar(
-                  background: CollapsibleProfileHeader(
-                    userId: widget.userId,
-                    profileImageUrl: appUser?.profileImageUrl,
-                    username: appUser?.username ?? 'Artist Name',
-                    bio: _bio ?? 'Welcome to my profile! Book me for your next event.',
-                  ),
-                  titlePadding: EdgeInsets.zero,
-                  title: _isHeaderCollapsed
-                      ? Text(
-                    appUser?.username ?? 'Artist Name',
-                    style: TextStyle(
-                      fontFamily: AppTheme.artistUsernameFont,
-                      fontSize: 20,
-                      fontWeight: FontWeight.bold,
-                      color: AppColors.primary,
-                    ),
-                  )
-                      : null,
+                flexibleSpace: LayoutBuilder(
+                  builder: (context, constraints){
+                    final top = constraints.biggest.height;
+                    final isFullyCollapsed = top <= kToolbarHeight + 50;
+
+                    return FlexibleSpaceBar(
+                      background: CollapsibleProfileHeader(
+                        userId: widget.userId,
+                        profileImageUrl: appUser?.profileImageUrl,
+                        username: appUser?.username ?? 'Artist Name',
+                        bio: _bio ?? 'Welcome to my profile! Book me for your next events',
+                        isCollapsed: isFullyCollapsed,
+                      ),
+                      titlePadding: EdgeInsets.zero,
+                      title: null,
+                    );
+                  },
                 ),
               ),
 

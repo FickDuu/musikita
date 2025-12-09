@@ -3,29 +3,30 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../data/models/music_post.dart';
-import '../home/widgets/music_player_card.dart';
+import '../../musician/home/widgets/music_player_card.dart';
 
-/// Discover music screen - Browse music from all musicians
-class DiscoverMusicScreen extends StatefulWidget {
+/// Organizer's view of Discover Music - Browse musicians' music
+/// Same as musician's discover music, but for organizers
+class OrganizerDiscoverMusicScreen extends StatefulWidget {
   final String userId;
 
-  const DiscoverMusicScreen({
+  const OrganizerDiscoverMusicScreen({
     super.key,
     required this.userId,
   });
 
   @override
-  State<DiscoverMusicScreen> createState() => _DiscoverMusicScreenState();
+  State<OrganizerDiscoverMusicScreen> createState() => _OrganizerDiscoverMusicScreenState();
 }
 
-class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
+class _OrganizerDiscoverMusicScreenState extends State<OrganizerDiscoverMusicScreen> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Discover Music'),
+        title: const Text('Discover Musicians'),
         automaticallyImplyLeading: false,
       ),
       body: AppBackground(
@@ -38,8 +39,6 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
     return StreamBuilder<QuerySnapshot>(
       stream: _firestore
           .collection('music_posts')
-          .where('userId', isNotEqualTo: widget.userId) // Exclude own music
-          .orderBy('userId') // Required for isNotEqualTo
           .orderBy('uploadedAt', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
@@ -54,7 +53,6 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
 
         // Error state
         if (snapshot.hasError) {
-          print('FIRESTORE ERROR: ${snapshot.error}');
           return Center(
             child: Padding(
               padding: const EdgeInsets.all(32.0),
@@ -124,7 +122,7 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
                   ),
                   const SizedBox(height: 8),
                   Text(
-                    'Be the first to share your music!\nOther musicians\' posts will appear here.',
+                    'Musicians\' music will appear here when they upload.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
                       color: AppColors.textSecondary,
                     ),
@@ -152,8 +150,8 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
                 padding: const EdgeInsets.only(bottom: 16),
                 child: MusicPlayerCard(
                   musicPost: post,
-                  showArtistName: true, // Show artist name for discovery
-                  // No onDelete or onEdit = no options menu
+                  showArtistName: true, // Show artist name for organizers
+                  // No edit/delete for organizers (they don't own the music)
                 ),
               );
             },

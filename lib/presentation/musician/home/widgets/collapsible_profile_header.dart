@@ -12,6 +12,7 @@ class CollapsibleProfileHeader extends StatelessWidget {
   final String? profileImageUrl;
   final String username;
   final String bio;
+  final bool isCollapsed;
 
   const CollapsibleProfileHeader({
     super.key,
@@ -19,6 +20,7 @@ class CollapsibleProfileHeader extends StatelessWidget {
     this.profileImageUrl,
     required this.username,
     required this.bio,
+    this.isCollapsed = false,
   });
 
   @override
@@ -49,50 +51,57 @@ class CollapsibleProfileHeader extends StatelessWidget {
           left: 24,
           right: 24,
           bottom: 24,
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
-            children: [
-              // Username with custom font
-              Text(
-                username,
-                style: const TextStyle(
-                  fontFamily: AppTheme.artistUsernameFont,
-                  fontSize: 36,
-                  fontWeight: FontWeight.bold,
-                  color: AppColors.primary,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black,
-                      blurRadius: 4,
-                      offset: Offset(0, 2),
+          child: AnimatedOpacity(
+            opacity: isCollapsed ? 0.0 : 1.0,
+            duration: const Duration(milliseconds: 200),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisSize: MainAxisSize.min,
+              children: [
+                // Username with custom font
+                if(!isCollapsed)
+                  Text(
+                    username,
+                    style: const TextStyle(
+                      fontFamily: AppTheme.artistUsernameFont,
+                      fontSize: 36,
+                      fontWeight: FontWeight.bold,
+                      color: AppColors.primary,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black,
+                          blurRadius: 4,
+                          offset: Offset(0, 2),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                maxLines: 2,
-                overflow: TextOverflow.ellipsis,
-              ),
-              const SizedBox(height: 8),
+                    maxLines: 2,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                if(!isCollapsed)
+                  const SizedBox(height: 8),
 
-              // Bio
-              Text(
-                bio,
-                style: const TextStyle(
-                  fontSize: 14,
-                  color: AppColors.white,
-                  height: 1.4,
-                  shadows: [
-                    Shadow(
-                      color: Colors.black,
-                      blurRadius: 2,
-                      offset: Offset(0, 1),
+                // Bio
+                if(!isCollapsed)
+                  Text(
+                    bio,
+                    style: const TextStyle(
+                      fontSize: 14,
+                      color: AppColors.white,
+                      height: 1.4,
+                      shadows: [
+                        Shadow(
+                          color: Colors.black,
+                          blurRadius: 2,
+                          offset: Offset(0, 1),
+                        ),
+                      ],
                     ),
-                  ],
-                ),
-                maxLines: 3,
-                overflow: TextOverflow.ellipsis,
-              ),
-            ],
+                    maxLines: 3,
+                    overflow: TextOverflow.ellipsis,
+                  ),
+              ],
+            ),
           ),
         ),
 
