@@ -11,10 +11,12 @@ import '../../../data/models/music_post.dart';
 /// Post music screen - for uploading new music
 class PostMusicScreen extends StatefulWidget {
   final String userId;
+  final VoidCallback? onMusicPosted;
 
   const PostMusicScreen({
     super.key,
     required this.userId,
+    this.onMusicPosted,
   });
 
   @override
@@ -111,14 +113,13 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
           ),
         );
 
-        // Reset form
-        _titleController.clear();
-        setState(() {
-          _selectedAudioFile = null;
-          _selectedGenre = null;
-          _isUploading = false;
-          _uploadProgress = 0;
-        });
+        // Call the callback if provided
+        widget.onMusicPosted?.call();
+
+        // If no callback (opened directly), just pop
+        if (widget.onMusicPosted == null) {
+          Navigator.pop(context);
+        }
       }
     } catch (e) {
       _showError(e.toString());
@@ -141,9 +142,13 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         title: const Text('Post Music'),
-        automaticallyImplyLeading: false,
+        leading: IconButton(
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.pop(context),
+        ),
       ),
       body: AppBackground(
         child: SafeArea(

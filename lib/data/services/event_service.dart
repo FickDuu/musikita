@@ -509,7 +509,7 @@ class EventService {
   }
 
   /// Accept an application
-  Future<void> acceptApplication(String applicationId) async {
+  Future<void> acceptApplication(String applicationId, String eventId) async {
     try {
       await updateApplicationStatus(
         applicationId: applicationId,
@@ -521,7 +521,7 @@ class EventService {
   }
 
   /// Reject an application with optional reason
-  Future<void> rejectApplication(String applicationId, {String? reason}) async {
+  Future<void> rejectApplication(String applicationId, String eventId, String? reason) async {
     try {
       await updateApplicationStatus(
         applicationId: applicationId,
@@ -531,5 +531,18 @@ class EventService {
     } catch (e) {
       throw Exception('Failed to reject application: $e');
     }
+  }
+
+  Stream<List<EventApplication>> getOrganizerApplicationsStream(String organizerId) {
+    return _firestore
+        .collection('event_applications')
+        .where('organizerId', isEqualTo: organizerId)
+        .orderBy('appliedAt', descending: true)
+        .snapshots()
+        .map((snapshot){
+      return snapshot.docs
+          .map((doc) => EventApplication.fromJson(doc.data()))
+          .toList();
+    });
   }
 }

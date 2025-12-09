@@ -8,9 +8,8 @@ import '../../../core/widgets/app_background.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../../data/services/profile_service.dart';
 import 'widgets/events_tab.dart';
-import 'widgets/applications_tab.dart';
 import 'widgets/analytics_tab.dart';
-import '../create_event/create_event_screen.dart';
+import 'widgets/applications_tab.dart';
 
 /// Organizer home screen with create event FAB
 class OrganizerHomeScreen extends StatefulWidget {

@@ -11,7 +11,7 @@ import '../organizer/discover_music/organizer_discover_music_screen.dart';
 import '../organizer/discover_events/organizer_discover_events_screen.dart';
 import '../organizer/create_event/create_event_screen.dart';
 
-/// Main navigation that shows different screens based on user role
+/// Main navigation with bottom navbar and modal action button
 class MainNavigation extends StatefulWidget {
   final UserRole userRole;
   final String userId;
@@ -27,45 +27,101 @@ class MainNavigation extends StatefulWidget {
 }
 
 class _MainNavigationState extends State<MainNavigation> {
-  int _currentIndex = 0;
+  int _currentIndex = 0; // Start with discover music
 
   late final List<Widget> _screens;
 
   @override
   void initState() {
     super.initState();
-
     // Initialize screens based on user role
     if (widget.userRole == UserRole.musician) {
       _screens = [
-        DiscoverMusicScreen(userId: widget.userId),       // 0 - Discover music
-        DiscoverEventsScreen(userId: widget.userId),      // 1 - Discover events
-        PostMusicScreen(userId: widget.userId),           // 2 - Upload music (FAB)
-        MessagesScreen(userId: widget.userId),            // 3 - Messages
-        MusicianHomeScreen(userId: widget.userId),        // 4 - Profile
+        DiscoverMusicScreen(userId: widget.userId),    // 0
+        DiscoverEventsScreen(userId: widget.userId),   // 1
+        // Index 2 is for action button modal (not in stack)
+        MessagesScreen(userId: widget.userId),         // 2 (maps to nav index 3)
+        MusicianHomeScreen(userId: widget.userId),     // 3 (maps to nav index 4)
       ];
     } else {
-      // Organizer screens - 5 items now
       _screens = [
-        OrganizerDiscoverMusicScreen(userId: widget.userId),  // 0 - Browse musicians
-        OrganizerDiscoverEventsScreen(userId: widget.userId), // 1 - Browse events
-        CreateEventScreen(userId: widget.userId),             // 2 - Create event (FAB)
-        MessagesScreen(userId: widget.userId),                // 3 - Messages
-        OrganizerHomeScreen(userId: widget.userId),           // 4 - Profile
+        OrganizerDiscoverMusicScreen(userId: widget.userId),  // 0
+        OrganizerDiscoverEventsScreen(userId: widget.userId), // 1
+        // Index 2 is for action button modal (not in stack)
+        MessagesScreen(userId: widget.userId),                // 2 (maps to nav index 3)
+        OrganizerHomeScreen(userId: widget.userId),           // 3 (maps to nav index 4)
       ];
     }
+  }
+
+  /// Get screen index (accounting for the action button gap at index 2)
+  int get _screenIndex {
+    if (_currentIndex >= 3) {
+      return _currentIndex - 1; // Shift down because index 2 doesn't exist in stack
+    }
+    return _currentIndex;
+  }
+
+  /// Handle action button tap - opens modal
+  void _onActionButtonPressed() {
+    if (widget.userRole == UserRole.musician) {
+      _showPostMusicModal();
+    } else {
+      _showCreateEventModal();
+    }
+  }
+
+  /// Show post music modal for musicians
+  void _showPostMusicModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (context) => PostMusicScreen(
+        userId: widget.userId,
+        onMusicPosted: () {
+          // Close modal and navigate to Discover Music
+          Navigator.pop(context);
+          setState(() {
+            _currentIndex = 0;
+          });
+        },
+      ),
+    );
+  }
+
+  /// Show create event modal for organizers
+  void _showCreateEventModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      isDismissible: true,
+      enableDrag: false,
+      backgroundColor: Colors.transparent,
+      builder: (context) => CreateEventScreen(
+        userId: widget.userId,
+        onEventCreated: () {
+          // Close modal and navigate to Discover Events
+          Navigator.pop(context);
+          setState(() {
+            _currentIndex = 1;
+          });
+        },
+      ),
+    );
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       body: IndexedStack(
-        index: _currentIndex,
+        index: _screenIndex,
         children: _screens,
       ),
       bottomNavigationBar: widget.userRole == UserRole.musician
-          ? _buildMusicianNavBar()
-          : _buildOrganizerNavBar(),
+          ? _buildMusicianNavBar() : _buildOrganizerNavBar(),
       floatingActionButton: _buildFAB(),
       floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
     );
@@ -95,11 +151,11 @@ class _MainNavigationState extends State<MainNavigation> {
             children: [
               _buildNavItem(
                 icon: Icons.music_note,
-                label: 'Discover',
+                label: 'Music',
                 index: 0,
               ),
               _buildNavItem(
-                icon: Icons.calendar_today,
+                icon: Icons.event,
                 label: 'Events',
                 index: 1,
               ),
@@ -121,7 +177,7 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 
-  /// Organizer Navigation Bar - Now 5 items like musicians
+  /// Organizer Navigation Bar
   Widget _buildOrganizerNavBar() {
     return Container(
       decoration: BoxDecoration(
@@ -145,7 +201,7 @@ class _MainNavigationState extends State<MainNavigation> {
             children: [
               _buildNavItem(
                 icon: Icons.music_note,
-                label: 'Musicians',
+                label: 'Music',
                 index: 0,
               ),
               _buildNavItem(
@@ -160,7 +216,7 @@ class _MainNavigationState extends State<MainNavigation> {
                 index: 3,
               ),
               _buildNavItem(
-                icon: Icons.business,
+                icon: Icons.person,
                 label: 'Profile',
                 index: 4,
               ),
@@ -193,8 +249,8 @@ class _MainNavigationState extends State<MainNavigation> {
             Text(
               label,
               style: TextStyle(
-                fontSize: 12,
                 color: isSelected ? AppColors.primary : AppColors.grey,
+                fontSize: 12,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
@@ -204,12 +260,11 @@ class _MainNavigationState extends State<MainNavigation> {
     );
   }
 
-  /// FAB - Changes based on role
+  /// FAB - Opens modal instead of changing index
   Widget _buildFAB() {
-    final isSelected = _currentIndex == 2;
     return FloatingActionButton(
-      onPressed: () => setState(() => _currentIndex = 2),
-      backgroundColor: isSelected ? AppColors.primaryDark : AppColors.primary,
+      onPressed: _onActionButtonPressed,
+      backgroundColor: AppColors.primary,
       elevation: 4,
       shape: const CircleBorder(),
       child: const Icon(

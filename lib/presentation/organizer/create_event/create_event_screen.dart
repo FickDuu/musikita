@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_background.dart';
@@ -14,10 +13,12 @@ import '../../../data/models/music_post.dart';
 class CreateEventScreen extends StatefulWidget {
   final String userId;
   final Event? event; // For editing existing events
+  final VoidCallback? onEventCreated;
 
   const CreateEventScreen({
     super.key,
     required this.userId,
+    this.onEventCreated,
     this.event,
   });
 
@@ -237,7 +238,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       if (widget.event != null) {
         // Update existing event
         await _eventService.updateEvent(event);
-        if (mounted) {
+        if (mounted && context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Event updated successfully!'),
@@ -248,7 +249,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       } else {
         // Create new event
         await _eventService.createEvent(event);
-        if (mounted) {
+        if (mounted && context.mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             const SnackBar(
               content: Text('Event created successfully!'),
@@ -258,8 +259,14 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         }
       }
 
-      if (mounted) {
-        context.pop(); // Return to previous screen
+      if (mounted && context.mounted) {
+        // Call the callback if provided
+        widget.onEventCreated?.call();
+
+        // If no callback (opened directly), just pop
+        if (widget.onEventCreated == null && Navigator.canPop(context)) {
+          Navigator.pop(context);
+        }
       }
     } catch (e) {
       _showError(e.toString().replaceAll('Exception: ', ''));
@@ -282,11 +289,12 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: AppColors.white,
       appBar: AppBar(
         title: Text(widget.event != null ? 'Edit Event' : 'Create Event'),
         leading: IconButton(
-          icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          icon: const Icon(Icons.close),
+          onPressed: () => Navigator.pop(context),
         ),
       ),
       body: AppBackground(
@@ -412,7 +420,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
 
                   // Payment Type
                   DropdownButtonFormField<String>(
-                    value: _paymentType,
+                    initialValue: _paymentType,
                     decoration: const InputDecoration(
                       labelText: 'Payment Type',
                       prefixIcon: Icon(Icons.payments),
