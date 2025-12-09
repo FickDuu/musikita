@@ -51,6 +51,7 @@ class Message {
     return Message(
       id: json['id'] as String,
       senderId: json['senderId'] as String,
+      senderName: json['senderName'] as String,
       text: json['text'] as String,
       timestamp: (json['timestamp'] as Timestamp).toDate(),
       read: json['read'] as bool? ?? false,
