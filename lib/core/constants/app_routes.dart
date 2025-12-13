@@ -25,6 +25,7 @@ class AppRoutes {
   static const String musicianProfile = '/musician/profile/:musicianId';
   static const String musicianOwnProfile = '/musician/profile'; // Own profile
   static const String musicianEditProfile = '/musician/edit-profile';
+  static const String musicianPostMusic = '/musician/post-music';
 
   // ========================================================
   // ORGANIZER ROUTES

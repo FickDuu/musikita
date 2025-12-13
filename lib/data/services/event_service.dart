@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:musikita/data/services/notification_service.dart';
 import '../models/event.dart';
 import '../models/event_application.dart';
 import 'package:musikita/core/config/app_config.dart';
@@ -109,11 +110,25 @@ class EventService {
         message: message,
       );
 
+      // Create notification for organizer
+      final notificationService = NotificationService();
+      await notificationService.createNotification(
+        userId: organizerId,
+        type: 'new_application',
+        title: 'New Application',
+        body: '$musicianName applied to "$eventName"',
+        data: {
+          'eventId': eventId,
+          'applicationId': docRef.id,
+        },
+      );
+
       await docRef.set(application.toJson());
       return application;
     } catch (e) {
       throw Exception('Failed to apply: $e');
     }
+
   }
 
   //check musician has applied to event
@@ -275,20 +290,53 @@ class EventService {
           .update(updates);
 
       // If accepted, decrease available slots
-      if (status == 'accepted') {
-        final app = await _firestore
-            .collection(AppConfig.eventApplicationsCollection)
-            .doc(applicationId)
-            .get();
+      final app = await _firestore
+          .collection(AppConfig.eventApplicationsCollection)
+          .doc(applicationId)
+          .get();
 
-        if (app.exists) {
-          final eventId = app.data()!['eventId'] as String;
-          await _firestore.collection(AppConfig.eventsCollection).doc(eventId).update({
+      if(app.exists) {
+        final appData = app.data()!;
+        final eventId = appData['eventId'] as String;
+        final musicianId = appData['musicianId'] as String;
+        final eventName = appData['eventName'] as String;
+
+        if (status == 'accepted') {
+          await _firestore
+              .collection(AppConfig.eventsCollection)
+              .doc(eventId)
+              .update({
             'slotsAvailable': FieldValue.increment(-1),
           });
         }
+        //create notification
+        final notificationService = NotificationService();
+        if (status == 'accepted') {
+          await notificationService.createNotification(
+            userId: musicianId,
+            type: 'application_accepted',
+            title: 'Application Accepted',
+            body: 'Your application to "$eventName" has been accepted.',
+            data: {
+              'eventId': eventId,
+              'applicationId': applicationId
+            },
+          );
+        } else if (status == 'rejected') {
+          await notificationService.createNotification(
+            userId: musicianId,
+            type: 'application_rejected',
+            title: 'Application Rejected',
+            body: 'Your application to "$eventName" has been rejected.',
+            data: {
+              'eventId': eventId,
+              'applicationId': applicationId
+            },
+          );
+        }
       }
-    } catch (e) {
+    }
+    catch (e) {
       throw Exception('Failed to update application: $e');
     }
   }

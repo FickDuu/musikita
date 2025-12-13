@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_dimensions.dart';
+import '../../core/constants/app_routes.dart';
 import '../../core/config/app_config.dart';
 
 /// Splash screen displayed on app launch
@@ -38,7 +39,7 @@ class _SplashScreenState extends State<SplashScreen>
     // Navigate to auth gate after 3 seconds
     Future.delayed(Duration(seconds: AppConfig.splashScreenDuration), () {
       if (mounted) {
-        context.go('/auth');
+        context.go(AppRoutes.login);
       }
     });
   }

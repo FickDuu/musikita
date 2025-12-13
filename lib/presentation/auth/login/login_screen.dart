@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:musikita/core/constants/app_routes.dart';
 import '../../../core/constants/app_assets.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
@@ -51,7 +52,7 @@ class _LoginScreenState extends State<LoginScreen> {
           context,
           '${AppStrings.loginSuccess} Welcome, ${appUser.username}!',
         );
-        context.go('/auth');
+        context.go(AppRoutes.login);
       }
     } catch(e, stackTrace){
       if(mounted){
@@ -209,7 +210,7 @@ class _LoginScreenState extends State<LoginScreen> {
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       TextButton(
-                        onPressed: () => context.go('/register'),
+                        onPressed: () => context.go(AppRoutes.register),
                         child: const Text(AppStrings.signUpHere),
                       ),
                     ],

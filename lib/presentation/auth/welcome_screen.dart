@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_routes.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/widgets/app_background.dart';
 import 'package:musikita/core/constants/app_dimensions.dart';
@@ -66,7 +67,7 @@ class WelcomeScreen extends StatelessWidget {
                     SizedBox(
                       width: double.infinity,
                       child: ElevatedButton(
-                        onPressed: () => context.go('/register'),
+                        onPressed: () => context.go(AppRoutes.register),
                         child: const Text(AppStrings.getStarted),
                       ),
                     ),
@@ -81,7 +82,7 @@ class WelcomeScreen extends StatelessWidget {
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         TextButton(
-                          onPressed: () => context.go('/login'),
+                          onPressed: () => context.go(AppRoutes.login),
                           child: const Text(AppStrings.login),
                         ),
                       ],

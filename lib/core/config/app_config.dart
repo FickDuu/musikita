@@ -56,6 +56,9 @@ class AppConfig {
   // Firestore event applications collection name
   static const String eventApplicationsCollection = 'event_applications';
 
+  // Firestore notifications collection name
+  static const String notificationsCollection = 'notifications';
+
   // Firebase Storage profile images path
   static const String profileImagesPath = 'profile_images';
 

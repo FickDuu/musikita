@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:musikita/data/services/notification_service.dart';
 import '../models/conversation.dart';
 import '../models/message.dart';
 import 'package:musikita/core/config/app_config.dart';
@@ -26,9 +27,9 @@ class MessagingService {
         'Getting or creating conversation between $currentUserId and $otherUserId',
         tag: 'MessagingService',
       );
-    final conversationId = Conversation.generateId(currentUserId, otherUserId);
-    final conversationRef = _firestore.collection(AppConfig.conversationsCollection).doc(conversationId);
-    final conversationDoc = await conversationRef.get();
+      final conversationId = Conversation.generateId(currentUserId, otherUserId);
+      final conversationRef = _firestore.collection(AppConfig.conversationsCollection).doc(conversationId);
+      final conversationDoc = await conversationRef.get();
 
       if (conversationDoc.exists) {
         LoggerService.info(
@@ -38,42 +39,42 @@ class MessagingService {
         return conversationId;
       }
 
-    //create new chat
+      //create new chat
       LoggerService.info(
         'Creating new conversation: $conversationId',
         tag: 'MessagingService',
       );
-    final now = DateTime.now();
-    final conversation = Conversation(
-      id: conversationId,
-      participants: [currentUserId, otherUserId],
-      participantDetails: {
-        currentUserId: ParticipantDetail(
-          name: currentUserName,
-          role: currentUserRole,
-          profileImageUrl: currentUserImageUrl,
-        ),
-        otherUserId: ParticipantDetail(
-          name: otherUserName,
-          role: otherUserRole,
-          profileImageUrl: otherUserImageUrl,
-        ),
-      },
-      unreadCount: {
-        currentUserId: 0,
-        otherUserId: 0,
-      },
-      createdAt: now,
-      updatedAt: now,
-    );
+      final now = DateTime.now();
+      final conversation = Conversation(
+        id: conversationId,
+        participants: [currentUserId, otherUserId],
+        participantDetails: {
+          currentUserId: ParticipantDetail(
+            name: currentUserName,
+            role: currentUserRole,
+            profileImageUrl: currentUserImageUrl,
+          ),
+          otherUserId: ParticipantDetail(
+            name: otherUserName,
+            role: otherUserRole,
+            profileImageUrl: otherUserImageUrl,
+          ),
+        },
+        unreadCount: {
+          currentUserId: 0,
+          otherUserId: 0,
+        },
+        createdAt: now,
+        updatedAt: now,
+      );
 
-    await conversationRef.set(conversation.toJson());
+      await conversationRef.set(conversation.toJson());
       LoggerService.success(
         'Conversation created successfully: $conversationId',
         tag: 'MessagingService',
       );
-    return conversationId;
-  }on FirebaseException catch (e, stackTrace) {
+      return conversationId;
+    }on FirebaseException catch (e, stackTrace) {
       LoggerService.error(
         'Failed to get/create conversation',
         tag: 'MessagingService',
@@ -125,20 +126,20 @@ class MessagingService {
         'Fetching conversation: $conversationId',
         tag: 'MessagingService',
       );
-    final doc = await _firestore
-        .collection(AppConfig.conversationsCollection)
-        .doc(conversationId)
-        .get();
-    if (!doc.exists) {
+      final doc = await _firestore
+          .collection(AppConfig.conversationsCollection)
+          .doc(conversationId)
+          .get();
+      if (!doc.exists) {
 
-      LoggerService.warning(
-        'Conversation not found: $conversationId',
-        tag: 'MessagingService',
-      );
-      return null;
+        LoggerService.warning(
+          'Conversation not found: $conversationId',
+          tag: 'MessagingService',
+        );
+        return null;
+      }
+      return Conversation.fromJson({...doc.data()!, 'id': doc.id});
     }
-    return Conversation.fromJson({...doc.data()!, 'id': doc.id});
-  }
     catch (e, stackTrace) {
       LoggerService.error(
         'Error fetching conversation: $conversationId',
@@ -185,9 +186,9 @@ class MessagingService {
         tag: 'MessagingService',
       );
 
-    await _firestore.collection(AppConfig.conversationsCollection).doc(conversationId).update({
-      'unreadCount.$userId': 0,
-    });
+      await _firestore.collection(AppConfig.conversationsCollection).doc(conversationId).update({
+        'unreadCount.$userId': 0,
+      });
 
       LoggerService.success(
         'Conversation marked as read: $conversationId',
@@ -229,43 +230,53 @@ class MessagingService {
         'Sending message in conversation: $conversationId',
         tag: 'MessagingService',
       );
-    final now = DateTime.now();
+      final now = DateTime.now();
 
-    //create message doc
-    final messageRef = _firestore.collection(AppConfig.conversationsCollection)
-        .doc(conversationId).collection(AppConfig.messagesCollection).doc();
+      //create message doc
+      final messageRef = _firestore.collection(AppConfig.conversationsCollection)
+          .doc(conversationId).collection(AppConfig.messagesCollection).doc();
 
-    final message = Message(
-      id: messageRef.id,
-      senderId: senderId,
-      senderName: senderName,
-      text: text,
-      timestamp: now,
-      read: false,
-    );
+      final message = Message(
+        id: messageRef.id,
+        senderId: senderId,
+        senderName: senderName,
+        text: text,
+        timestamp: now,
+        read: false,
+      );
 
-    //smtg about atomicity?
-    final batch = _firestore.batch();
+      //smtg about atomicity?
+      final batch = _firestore.batch();
 
-    //add message
-    batch.set(messageRef, message.toJson());
+      //add message
+      batch.set(messageRef, message.toJson());
 
-    final conversationRef = _firestore.collection(AppConfig.conversationsCollection).doc(conversationId);
-    batch.update(conversationRef, {
-      'lastMessage': text,
-      'lastMessageTime': Timestamp.fromDate(now),
-      'lastMessageSenderId': senderId,
-      'updatedAt': Timestamp.fromDate(now),
-      'unreadCount.$receiverId': FieldValue.increment(1),
-    });
+      final conversationRef = _firestore.collection(AppConfig.conversationsCollection).doc(conversationId);
+      batch.update(conversationRef, {
+        'lastMessage': text,
+        'lastMessageTime': Timestamp.fromDate(now),
+        'lastMessageSenderId': senderId,
+        'updatedAt': Timestamp.fromDate(now),
+        'unreadCount.$receiverId': FieldValue.increment(1),
+      });
 
-    await batch.commit();
+      await batch.commit();
+
+      // Create notification for receiver
+      final notificationService = NotificationService();
+      await notificationService.createNotification(
+        userId: receiverId,
+        type: 'new_message',
+        title: 'New Message from $senderName',
+        body: text.length > 50 ? '${text.substring(0, 50)}...' : text,
+        data: {'conversationId': conversationId},
+      );
 
       LoggerService.success(
         'Message sent successfully in conversation: $conversationId',
         tag: 'MessagingService',
       );
-  }on FirebaseException catch (e, stackTrace) {
+    }on FirebaseException catch (e, stackTrace) {
       LoggerService.error(
         'Failed to send message in conversation: $conversationId',
         tag: 'MessagingService',
@@ -400,10 +411,10 @@ class MessagingService {
   }) async {
     try{
       LoggerService.info('Updating participant details for user: $userId',
-      tag: 'MessagingService'
+          tag: 'MessagingService'
       );
       final conversations = await _firestore.collection(AppConfig.conversationsCollection)
-      .where('participants', arrayContains: userId).get();
+          .where('participants', arrayContains: userId).get();
 
       final batch = _firestore.batch();
 

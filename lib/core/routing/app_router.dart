@@ -14,6 +14,7 @@ import '../../presentation/common/navigation/main_navigation_shell.dart';
 import '../../presentation/musician/home/musician_home_screen.dart';
 import '../../presentation/musician/profile/musician_profile_screen.dart';
 import '../../presentation/musician/profile/edit_profile_screen.dart';
+import '../../presentation/musician/music/post_music_screen.dart';
 
 // Organizer screens
 import '../../presentation/organizer/home/organizer_home_screen.dart';
@@ -25,6 +26,7 @@ import '../../presentation/shared/discover/discover_events_screen.dart';
 import '../../presentation/shared/discover/discover_music_screen.dart';
 import '../../presentation/shared/messaging/messages_screen.dart';
 import '../../presentation/shared/messaging/chat_screen.dart';
+import '../../presentation/shared/notifications/notifications_screen.dart';
 
 /// GoRouter configuration for MUSIKITA
 /// Uses unified navigation shell with role-aware routing
@@ -40,10 +42,7 @@ class AppRouter {
     redirect: RouteGuards.authGuard,
     errorBuilder: (context, state) => _ErrorScreen(error: state.error),
     routes: [
-      // ========================================================
       // PUBLIC ROUTES
-      // ========================================================
-
       GoRoute(
         path: AppRoutes.splash,
         name: 'splash',
@@ -70,19 +69,13 @@ class AppRouter {
         ),
       ),
 
-      // ========================================================
       // MAIN NAVIGATION SHELL (With bottom navigation)
-      // ========================================================
-
       ShellRoute(
         builder: (context, state, child) {
           return MainNavigationShell(child: child);
         },
         routes: [
-          // --------------------------------------------------------
           // MUSICIAN ROUTES
-          // --------------------------------------------------------
-
           GoRoute(
             path: AppRoutes.musicianHome,
             name: 'musicianHome',
@@ -133,10 +126,21 @@ class AppRouter {
             },
           ),
 
-          // --------------------------------------------------------
-          // ORGANIZER ROUTES
-          // --------------------------------------------------------
+          GoRoute(
+            path: AppRoutes.musicianPostMusic,
+            name: 'musicianPostMusic',
+            builder: (context, state) {
+              if (!RouteGuards.canAccessMusicianRoutes(context)) {
+                RouteGuards.handleUnauthorizedAccess(context);
+                return const SizedBox.shrink();
+              }
 
+              final userId = RouteGuards.getCurrentUserId(context);
+              return PostMusicScreen(userId: userId);
+            },
+          ),
+
+          // ORGANIZER ROUTES
           GoRoute(
             path: AppRoutes.organizerHome,
             name: 'organizerHome',
@@ -218,10 +222,7 @@ class AppRouter {
             },
           ),
 
-          // --------------------------------------------------------
           // SHARED ROUTES (Both roles with role-aware behavior)
-          // --------------------------------------------------------
-
           GoRoute(
             path: AppRoutes.discoverEvents,
             name: 'discoverEvents',
@@ -255,13 +256,19 @@ class AppRouter {
               );
             },
           ),
+
+          GoRoute(
+            path: AppRoutes.notifications,
+            name: 'notifications',
+            builder: (context, state) {
+              final userId = RouteGuards.getCurrentUserId(context);
+              return NotificationsScreen(userId: userId);
+            }
+          )
         ],
       ),
 
-      // ========================================================
       // ERROR ROUTES
-      // ========================================================
-
       GoRoute(
         path: AppRoutes.notFound,
         name: 'notFound',
@@ -270,11 +277,8 @@ class AppRouter {
     ],
   );
 
-  // ========================================================
   // TRANSITION BUILDERS
-  // ========================================================
-
-  /// Build page with fade transition
+  // Build page with fade transition
   static Page _buildPageWithFadeTransition({
     required BuildContext context,
     required GoRouterState state,
@@ -318,10 +322,7 @@ class AppRouter {
     );
   }
 
-  // ========================================================
   // NAVIGATION HELPERS
-  // ========================================================
-
   /// Navigate to a route by path
   static void navigateTo(BuildContext context, String path) {
     LoggerService.debug('Navigating to: $path', tag: _tag);
@@ -352,10 +353,7 @@ class AppRouter {
   }
 }
 
-// ========================================================
 // ERROR SCREENS
-// ========================================================
-
 class _ErrorScreen extends StatelessWidget {
   final Exception? error;
 

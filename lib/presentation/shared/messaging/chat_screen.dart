@@ -269,22 +269,22 @@ class _ChatScreenState extends State<ChatScreen> {
   }
 
   Widget _buildAvatar() {
-    if (widget.otherUser.profileImageUrl != null) {
+    if (_otherUser!.profileImageUrl != null) {
       return CircleAvatar(
-        backgroundImage: NetworkImage(widget.otherUser.profileImageUrl!),
+        backgroundImage: NetworkImage(_otherUser!.profileImageUrl!),
         radius: 18,
       );
     }
 
     return CircleAvatar(
-      backgroundColor: widget.otherUser.role == 'musician'
+      backgroundColor: _otherUser!.role == 'musician'
           ? AppColors.primary.withValues(alpha: 0.1)
           : AppColors.secondary.withValues(alpha: 0.1),
       radius: 18,
       child: Text(
-        widget.otherUser.name[0].toUpperCase(),
+        _otherUser!.name[0].toUpperCase(),
         style: TextStyle(
-          color: widget.otherUser.role == 'musician' ? AppColors.primary : AppColors.secondary,
+          color: _otherUser!.role == 'musician' ? AppColors.primary : AppColors.secondary,
           fontWeight: FontWeight.bold,
           fontSize: 16,
         ),

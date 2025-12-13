@@ -113,8 +113,6 @@ class _MessagesScreenState extends State<MessagesScreen> {
         builder: (context) => ChatScreen(
           conversationId: conversation.id,
           currentUserId: widget.userId,
-          otherUser: conversation.getOtherParticipant(widget.userId),
-          otherUserId: conversation.getOtherParticipantId(widget.userId),
         ),
       ),
     );

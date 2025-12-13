@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:musikita/core/constants/app_routes.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
@@ -118,7 +119,7 @@ class CollapsibleProfileHeader extends StatelessWidget {
                   final authProvider = Provider.of<AuthProvider>(context, listen: false);
                   await authProvider.signOut();
                   if (context.mounted) {
-                    context.go('/auth');
+                    context.go(AppRoutes.login);
                   }
                 },
                 icon: const Icon(
@@ -136,7 +137,7 @@ class CollapsibleProfileHeader extends StatelessWidget {
               // Edit Profile Button
               IconButton(
                 onPressed: () {
-                  context.push('/edit-profile');
+                  context.push(AppRoutes.musicianEditProfile);
                 },
                 icon: const Icon(
                   Icons.edit,

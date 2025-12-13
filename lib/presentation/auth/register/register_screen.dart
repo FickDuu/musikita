@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import 'package:musikita/core/constants/app_dimensions.dart';
+import 'package:musikita/core/constants/app_routes.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_background.dart';
@@ -9,7 +10,6 @@ import '../../../data/models/user_role.dart';
 import '../../../data/services/auth_service.dart';
 import '../../common/widgets/role_selection_card.dart';
 import '../../../core/services/error_handler_service.dart';
-import '../../../core/constants/error_messages.dart';
 
 /// Registration screen with role selection
 class RegisterScreen extends StatefulWidget {
@@ -70,7 +70,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
           '${AppStrings.registrationSuccess} Welcome, ${appUser.username}!',
         );
         // Navigate to auth gate (will redirect to home)
-        context.go('/auth');
+        context.go(AppRoutes.login);
       }
     } catch (e, stackTrace){
       if(mounted){
@@ -96,7 +96,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         title: const Text(AppStrings.signUp),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.go('/welcome'),
+          onPressed: () => context.pop(),
         ),
       ),
       body: AppBackground(
@@ -236,7 +236,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                         style: Theme.of(context).textTheme.bodyMedium,
                       ),
                       TextButton(
-                        onPressed: () => context.go('/login'),
+                        onPressed: () => context.go(AppRoutes.login),
                         child: const Text(AppStrings.login),
                       ),
                     ],

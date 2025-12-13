@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:musikita/core/constants/app_routes.dart';
 import 'package:musikita/data/models/app_user.dart';
 import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
@@ -211,7 +212,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
                   await authProvider.signOut();
                   if(mounted) {
                     if (context.mounted) {
-                      context.go('/auth');
+                      context.go(AppRoutes.login);
                     }
                   }
                 },
@@ -230,7 +231,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
               // Edit Profile Button
               IconButton(
                 onPressed: () {
-                  context.push('/edit-profile');
+                  context.push(AppRoutes.organizerEditProfile);
                 },
                 icon: const Icon(
                   Icons.edit,
