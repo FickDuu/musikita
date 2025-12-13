@@ -1,22 +1,22 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_dimensions.dart';
+import '../../../core/services/logger_service.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../data/models/organizer.dart';
 import '../../../data/models/event.dart';
 import '../../../data/services/event_service.dart';
+import '../../../data/services/organizer_service.dart';
 import 'package:intl/intl.dart';
-import '../../../core/constants/app_dimensions.dart';
 
-/// Screen to view another organizer's profile
-/// Shows organizer info and their created events
+/// Screen to view an organizer's profile
+/// Loads organizer data internally using organizerId
 class OrganizerProfileScreen extends StatefulWidget {
   final String organizerId;
-  final Organizer organizer;
 
   const OrganizerProfileScreen({
     super.key,
     required this.organizerId,
-    required this.organizer,
   });
 
   @override
@@ -24,32 +24,121 @@ class OrganizerProfileScreen extends StatefulWidget {
 }
 
 class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
+  static const String _tag = 'OrganizerProfileScreen';
   final _eventService = EventService();
+  final _organizerService = OrganizerService();
+
+  Organizer? _organizer;
+  bool _isLoading = true;
+  String? _error;
+
+  @override
+  void initState() {
+    super.initState();
+    _loadOrganizerData();
+  }
+
+  Future<void> _loadOrganizerData() async {
+    try {
+      setState(() {
+        _isLoading = true;
+        _error = null;
+      });
+
+      LoggerService.debug('Loading organizer: ${widget.organizerId}', tag: _tag);
+
+      final organizer = await _organizerService.getOrganizerById(widget.organizerId);
+
+      if (mounted) {
+        setState(() {
+          _organizer = organizer;
+          _isLoading = false;
+        });
+      }
+
+      if (organizer == null) {
+        LoggerService.warning('Organizer not found: ${widget.organizerId}', tag: _tag);
+        if (mounted) {
+          setState(() => _error = 'Organizer not found');
+        }
+      }
+    } catch (e) {
+      LoggerService.error('Error loading organizer: $e', tag: _tag);
+      if (mounted) {
+        setState(() {
+          _error = 'Error loading organizer profile';
+          _isLoading = false;
+        });
+      }
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text(widget.organizer.organizerName ?? 'Organizer'),
+        title: Text(_organizer?.organizerName ?? 'Organizer'),
       ),
       body: AppBackground(
-        child: SingleChildScrollView(
+        child: _buildBody(),
+      ),
+    );
+  }
+
+  Widget _buildBody() {
+    if (_isLoading) {
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.primary),
+      );
+    }
+
+    if (_error != null || _organizer == null) {
+      return Center(
+        child: Padding(
+          padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
           child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
             children: [
-              _buildProfileHeader(),
-              const SizedBox(height: AppDimensions.spacingLarge),
-              _buildEventsSection(),
+              Icon(
+                Icons.error_outline,
+                size: 64,
+                color: AppColors.error.withValues(alpha: 0.5),
+              ),
+              const SizedBox(height: AppDimensions.spacingMedium),
+              Text(
+                _error ?? 'Organizer not found',
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      color: AppColors.error,
+                    ),
+                textAlign: TextAlign.center,
+              ),
+              const SizedBox(height: AppDimensions.spacingMedium),
+              ElevatedButton.icon(
+                onPressed: _loadOrganizerData,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Retry'),
+              ),
             ],
           ),
         ),
+      );
+    }
+
+    return SingleChildScrollView(
+      child: Column(
+        children: [
+          _buildProfileHeader(),
+          const SizedBox(height: AppDimensions.spacingLarge),
+          _buildEventsSection(),
+        ],
       ),
     );
   }
 
   Widget _buildProfileHeader() {
     return Container(
-      margin: const EdgeInsets.all(16),
-      padding: const EdgeInsets.all(24),
+      margin: const EdgeInsets.all(AppDimensions.spacingMedium),
+      padding: const EdgeInsets.all(AppDimensions.spacingLarge),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
@@ -81,17 +170,16 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
 
           // Organizer name
           Text(
-            widget.organizer.organizerName ?? 'Unknown Organizer',
+            _organizer!.organizerName ?? 'Unknown Organizer',
             style: Theme.of(context).textTheme.headlineSmall?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+                  fontWeight: FontWeight.bold,
+                ),
             textAlign: TextAlign.center,
           ),
           const SizedBox(height: AppDimensions.spacingSmall),
 
           // Company name
-          if (widget.organizer.companyName != null &&
-              widget.organizer.companyName!.isNotEmpty)
+          if (_organizer!.companyName != null && _organizer!.companyName!.isNotEmpty)
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -102,17 +190,16 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  widget.organizer.companyName!,
+                  _organizer!.companyName!,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+                        color: AppColors.textSecondary,
+                      ),
                 ),
               ],
             ),
 
           // Contact number
-          if (widget.organizer.contactNumber != null &&
-              widget.organizer.contactNumber!.isNotEmpty) ...[
+          if (_organizer!.contactNumber != null && _organizer!.contactNumber!.isNotEmpty) ...[
             const SizedBox(height: AppDimensions.spacingSmall),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -124,18 +211,17 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  widget.organizer.contactNumber!,
+                  _organizer!.contactNumber!,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+                        color: AppColors.textSecondary,
+                      ),
                 ),
               ],
             ),
           ],
 
           // Location
-          if (widget.organizer.location != null &&
-              widget.organizer.location!.isNotEmpty) ...[
+          if (_organizer!.location != null && _organizer!.location!.isNotEmpty) ...[
             const SizedBox(height: AppDimensions.spacingSmall),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
@@ -147,18 +233,17 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                 ),
                 const SizedBox(width: 4),
                 Text(
-                  widget.organizer.location!,
+                  _organizer!.location!,
                   style: Theme.of(context).textTheme.bodyMedium?.copyWith(
-                    color: AppColors.textSecondary,
-                  ),
+                        color: AppColors.textSecondary,
+                      ),
                 ),
               ],
             ),
           ],
 
           // Business type
-          if (widget.organizer.businessType != null &&
-              widget.organizer.businessType!.isNotEmpty) ...[
+          if (_organizer!.businessType != null && _organizer!.businessType!.isNotEmpty) ...[
             const SizedBox(height: AppDimensions.spacingSmall),
             Container(
               padding: const EdgeInsets.symmetric(
@@ -170,7 +255,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                 borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
               ),
               child: Text(
-                widget.organizer.businessType!,
+                _organizer!.businessType!,
                 style: const TextStyle(
                   color: AppColors.primary,
                   fontSize: 12,
@@ -181,13 +266,12 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
           ],
 
           // Bio
-          if (widget.organizer.bio != null &&
-              widget.organizer.bio!.isNotEmpty) ...[
+          if (_organizer!.bio != null && _organizer!.bio!.isNotEmpty) ...[
             const SizedBox(height: AppDimensions.spacingMedium),
             const Divider(),
             const SizedBox(height: AppDimensions.spacingMedium),
             Text(
-              widget.organizer.bio!,
+              _organizer!.bio!,
               style: Theme.of(context).textTheme.bodyMedium,
               textAlign: TextAlign.center,
             ),
@@ -199,15 +283,15 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
 
   Widget _buildEventsSection() {
     return Padding(
-      padding: const EdgeInsets.symmetric(horizontal: 16),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingMedium),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
           Text(
-            'Events by ${widget.organizer.organizerName ?? "this organizer"}',
+            'Events by ${_organizer!.organizerName ?? "this organizer"}',
             style: Theme.of(context).textTheme.titleLarge?.copyWith(
-              fontWeight: FontWeight.bold,
-            ),
+                  fontWeight: FontWeight.bold,
+                ),
           ),
           const SizedBox(height: AppDimensions.spacingMedium),
           _buildEventsList(),
@@ -223,7 +307,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return const Center(
             child: Padding(
-              padding: EdgeInsets.all(32.0),
+              padding: EdgeInsets.all(AppDimensions.spacingXLarge),
               child: CircularProgressIndicator(color: AppColors.primary),
             ),
           );
@@ -232,7 +316,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
         if (snapshot.hasError) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 children: [
                   const Icon(
@@ -256,7 +340,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
         if (events.isEmpty) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 children: [
                   Icon(
@@ -273,8 +357,8 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                   Text(
                     'This organizer hasn\'t created any events',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                      color: AppColors.textSecondary,
-                    ),
+                          color: AppColors.textSecondary,
+                        ),
                     textAlign: TextAlign.center,
                   ),
                 ],
@@ -295,7 +379,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
     final isFull = event.slotsAvailable <= 0;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacingMedium),
       decoration: BoxDecoration(
         color: AppColors.white,
         borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
@@ -312,11 +396,11 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
         children: [
           // Event header
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(16),
+                top: Radius.circular(AppDimensions.radiusMedium),
               ),
             ),
             child: Row(
@@ -329,17 +413,15 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                     color: isPastEvent
                         ? AppColors.grey
                         : isFull
-                        ? AppColors.error
-                        : AppColors.primary,
+                            ? AppColors.error
+                            : AppColors.primary,
                     borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
                       Text(
-                        DateFormat('MMM')
-                            .format(event.eventDate)
-                            .toUpperCase(),
+                        DateFormat('MMM').format(event.eventDate).toUpperCase(),
                         style: const TextStyle(
                           color: AppColors.white,
                           fontSize: 12,
@@ -366,10 +448,9 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                     children: [
                       Text(
                         event.eventName,
-                        style:
-                        Theme.of(context).textTheme.titleMedium?.copyWith(
-                          fontWeight: FontWeight.bold,
-                        ),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontWeight: FontWeight.bold,
+                            ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
@@ -385,12 +466,9 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                           Expanded(
                             child: Text(
                               event.venueName,
-                              style: Theme.of(context)
-                                  .textTheme
-                                  .bodySmall
-                                  ?.copyWith(
-                                color: AppColors.textSecondary,
-                              ),
+                              style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                                    color: AppColors.textSecondary,
+                                  ),
                               maxLines: 1,
                               overflow: TextOverflow.ellipsis,
                             ),
@@ -411,16 +489,16 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                     color: isPastEvent
                         ? AppColors.grey
                         : isFull
-                        ? AppColors.error
-                        : AppColors.success,
+                            ? AppColors.error
+                            : AppColors.success,
                     borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                   ),
                   child: Text(
                     isPastEvent
                         ? 'Past'
                         : isFull
-                        ? 'Full'
-                        : 'Open',
+                            ? 'Full'
+                            : 'Open',
                     style: const TextStyle(
                       color: AppColors.white,
                       fontSize: 10,
@@ -434,25 +512,14 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
 
           // Event details
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                // Time
-                _buildInfoRow(
-                  Icons.access_time,
-                  event.formattedTimeRange,
-                ),
+                _buildInfoRow(Icons.access_time, event.formattedTimeRange),
                 const SizedBox(height: AppDimensions.spacingSmall),
-
-                // Location
-                _buildInfoRow(
-                  Icons.location_on,
-                  event.location,
-                ),
+                _buildInfoRow(Icons.location_on, event.location),
                 const SizedBox(height: AppDimensions.spacingSmall),
-
-                // Payment
                 _buildInfoRow(
                   Icons.payments,
                   event.formattedPayment,
@@ -460,14 +527,10 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                   valueBold: true,
                 ),
                 const SizedBox(height: AppDimensions.spacingSmall),
-
-                // Slots
                 _buildInfoRow(
                   Icons.people,
                   '${event.slotsAvailable} / ${event.slotsTotal} slots available',
-                  valueColor: event.slotsAvailable <= 1
-                      ? AppColors.error
-                      : AppColors.textSecondary,
+                  valueColor: event.slotsAvailable <= 1 ? AppColors.error : AppColors.textSecondary,
                 ),
 
                 // Genres
@@ -478,10 +541,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                     runSpacing: 8,
                     children: event.genres.map((genre) {
                       return Container(
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
-                        ),
+                        padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.1),
                           borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
@@ -523,11 +583,11 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
   }
 
   Widget _buildInfoRow(
-      IconData icon,
-      String value, {
-        Color? valueColor,
-        bool valueBold = false,
-      }) {
+    IconData icon,
+    String value, {
+    Color? valueColor,
+    bool valueBold = false,
+  }) {
     return Row(
       children: [
         Icon(

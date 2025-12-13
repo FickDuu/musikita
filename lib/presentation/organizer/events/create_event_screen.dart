@@ -12,16 +12,17 @@ import '../../../core/constants/app_limits.dart';
 import '../../../core/config/app_config.dart';
 
 /// Create Event Screen for organizers
+/// Loads event data internally if eventId is provided (edit mode)
 class CreateEventScreen extends StatefulWidget {
   final String userId;
-  final Event? event; // For editing existing events
+  final String? eventId; // For editing existing events
   final VoidCallback? onEventCreated;
 
   const CreateEventScreen({
     super.key,
     required this.userId,
+    this.eventId,
     this.onEventCreated,
-    this.event,
   });
 
   @override
@@ -47,6 +48,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   String _paymentType = 'Paid';
   List<String> _selectedGenres = [];
   bool _isLoading = false;
+  bool _isLoadingEvent = false;
+  Event? _event;
 
   final List<String> _paymentTypes = ['Paid', 'Unpaid', 'Negotiable'];
 
@@ -54,25 +57,49 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   void initState() {
     super.initState();
 
-    // Initialize controllers with existing data if editing
-    final event = widget.event;
-    _eventNameController = TextEditingController(text: event?.eventName);
-    _venueNameController = TextEditingController(text: event?.venueName);
-    _descriptionController = TextEditingController(text: event?.description);
-    _locationController = TextEditingController(text: event?.location);
-    _paymentController = TextEditingController(
-      text: event?.payment.toString() ?? '',
-    );
-    _slotsController = TextEditingController(
-      text: event?.slotsTotal.toString() ?? '',
-    );
+    // Initialize empty controllers
+    _eventNameController = TextEditingController();
+    _venueNameController = TextEditingController();
+    _descriptionController = TextEditingController();
+    _locationController = TextEditingController();
+    _paymentController = TextEditingController();
+    _slotsController = TextEditingController();
 
-    if (event != null) {
-      _selectedDate = event.eventDate;
-      _startTime = _parseTime(event.startTime);
-      _endTime = _parseTime(event.endTime);
-      _paymentType = event.paymentType;
-      _selectedGenres = List.from(event.genres);
+    // Load event data if eventId is provided
+    if (widget.eventId != null) {
+      _loadEventData();
+    }
+  }
+
+  Future<void> _loadEventData() async {
+    setState(() => _isLoadingEvent = true);
+
+    try {
+      final event = await _eventService.getEventById(widget.eventId!);
+      if (event != null && mounted) {
+        setState(() {
+          _event = event;
+          _eventNameController.text = event.eventName;
+          _venueNameController.text = event.venueName;
+          _descriptionController.text = event.description;
+          _locationController.text = event.location;
+          _paymentController.text = event.payment.toString();
+          _slotsController.text = event.slotsTotal.toString();
+          _selectedDate = event.eventDate;
+          _startTime = _parseTime(event.startTime);
+          _endTime = _parseTime(event.endTime);
+          _paymentType = event.paymentType;
+          _selectedGenres = List.from(event.genres);
+          _isLoadingEvent = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoadingEvent = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading event: $e')),
+        );
+      }
     }
   }
 
@@ -216,7 +243,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       }
 
       final event = Event(
-        id: widget.event?.id ?? '',
+        id: _event?.id ?? '',
         organizerId: widget.userId,
         organizerName: organizerName,
         eventName: _eventNameController.text.trim(),
@@ -233,11 +260,11 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
         genres: _selectedGenres,
         slotsAvailable: int.parse(_slotsController.text.trim()),
         slotsTotal: int.parse(_slotsController.text.trim()),
-        createdAt: widget.event?.createdAt ?? DateTime.now(),
+        createdAt: _event?.createdAt ?? DateTime.now(),
         status: 'open',
       );
 
-      if (widget.event != null) {
+      if (_event != null) {
         // Update existing event
         await _eventService.updateEvent(event);
         if (mounted && context.mounted) {
@@ -296,7 +323,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
     return Scaffold(
       backgroundColor: AppColors.white,
       appBar: AppBar(
-        title: Text(widget.event != null ? 'Edit Event' : 'Create Event'),
+        title: Text(_event != null ? 'Edit Event' : 'Create Event'),
         leading: IconButton(
           icon: const Icon(Icons.close),
           onPressed: () => Navigator.pop(context),
@@ -555,7 +582,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                           color: AppColors.white,
                         ),
                       )
-                          : Text(widget.event != null
+                          : Text(_event != null
                           ? 'Update Event'
                           : 'Create Event'),
                     ),

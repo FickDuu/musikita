@@ -20,6 +20,10 @@ class AuthProvider extends ChangeNotifier{
   String? get error => _error;
   bool get isAuthenticated => _firebaseUser != null && _appUser != null;
 
+  // Convenience getters for routing
+  String? get userRole => _appUser?.role.name;
+  String? get userId => _appUser?.uid;
+
   AuthProvider(){
     _initAuthListener();
   }

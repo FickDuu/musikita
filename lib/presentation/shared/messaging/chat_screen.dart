@@ -9,18 +9,15 @@ import '../../../core/constants/app_limits.dart';
 
 
 /// Chat screen for one-on-one conversations
+/// Loads participant details internally from conversationId
 class ChatScreen extends StatefulWidget {
   final String conversationId;
   final String currentUserId;
-  final ParticipantDetail otherUser;
-  final String otherUserId;
 
   const ChatScreen({
     super.key,
     required this.conversationId,
     required this.currentUserId,
-    required this.otherUser,
-    required this.otherUserId,
   });
 
   @override
@@ -31,13 +28,40 @@ class _ChatScreenState extends State<ChatScreen> {
   final _messagingService = MessagingService();
   final _messageController = TextEditingController();
   final _scrollController = ScrollController();
+
   bool _isSending = false;
+  bool _isLoadingConversation = true;
+  Conversation? _conversation;
+  ParticipantDetail? _otherUser;
+  String? _otherUserId;
 
   @override
   void initState() {
     super.initState();
+    _loadConversationData();
     // Mark conversation as read when opened
     _messagingService.markConversationAsRead(widget.conversationId, widget.currentUserId);
+  }
+
+  Future<void> _loadConversationData() async {
+    try {
+      final conversation = await _messagingService.getConversation(widget.conversationId);
+      if (conversation != null && mounted) {
+        setState(() {
+          _conversation = conversation;
+          _otherUser = conversation.getOtherParticipant(widget.currentUserId);
+          _otherUserId = conversation.getOtherParticipantId(widget.currentUserId);
+          _isLoadingConversation = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() => _isLoadingConversation = false);
+        ScaffoldMessenger.of(context).showSnackBar(
+          SnackBar(content: Text('Error loading conversation: $e')),
+        );
+      }
+    }
   }
 
   @override
@@ -63,7 +87,7 @@ class _ChatScreenState extends State<ChatScreen> {
         senderId: widget.currentUserId,
         senderName: currentUserName,
         text: text,
-        receiverId: widget.otherUserId,
+        receiverId: _otherUserId!,
       );
 
       _messageController.clear();
@@ -95,6 +119,34 @@ class _ChatScreenState extends State<ChatScreen> {
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoadingConversation) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Loading...')),
+        body: const Center(child: CircularProgressIndicator(color: AppColors.primary)),
+      );
+    }
+
+    if (_otherUser == null) {
+      return Scaffold(
+        appBar: AppBar(title: const Text('Error')),
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const Icon(Icons.error_outline, size: 64, color: AppColors.error),
+              const SizedBox(height: AppDimensions.spacingMedium),
+              const Text('Failed to load conversation'),
+              const SizedBox(height: AppDimensions.spacingMedium),
+              ElevatedButton(
+                onPressed: () => Navigator.of(context).pop(),
+                child: const Text('Go Back'),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: Row(
@@ -106,11 +158,11 @@ class _ChatScreenState extends State<ChatScreen> {
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   Text(
-                    widget.otherUser.name,
+                    _otherUser!.name,
                     style: const TextStyle(fontSize: 16),
                   ),
                   Text(
-                    widget.otherUser.role == 'musician' ? 'Musician' : 'Organizer',
+                    _otherUser!.role == 'musician' ? 'Musician' : 'Organizer',
                     style: const TextStyle(
                       fontSize: 12,
                       color: AppColors.grey,

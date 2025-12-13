@@ -2,7 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '../../../data/services/messaging_service.dart';
 import '../../../data/models/conversation.dart';
-import '../../musician/messages/chat_screen.dart';
+import '../../shared/messaging/chat_screen.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/musician.dart';
 import 'package:musikita/data/providers/auth_provider.dart';
@@ -242,13 +242,6 @@ class ArtistInfoBottomSheet extends StatelessWidget {
                                 builder: (context) => ChatScreen(
                                       conversationId: conversationId,
                                       currentUserId: currentUser.uid,
-                                      otherUser: ParticipantDetail(
-                                        name: musician.artistName ?? 'Unknown',
-                                        role: 'musician',
-                                        profileImageUrl: musician
-                                            .profileImageUrl,
-                                      ),
-                                      otherUserId: musician.userId,
                                     ),
                               ),
                             );

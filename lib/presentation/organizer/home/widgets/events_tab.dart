@@ -148,7 +148,7 @@ class EventsTab extends StatelessWidget {
       MaterialPageRoute(
         builder: (context) => CreateEventScreen(
           userId: userId,
-          event: event,
+          eventId: event.id,
         ),
       ),
     );

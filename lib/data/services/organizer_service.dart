@@ -1,8 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:musikita/core/config/app_config.dart';
 import '../models/organizer.dart';
-import '../../core/exceptions/app_exception.dart';
-import '../../core/exceptions/firebase_exceptions.dart';
 import '../../core/services/logger_service.dart';
 
 class OrganizerService {
