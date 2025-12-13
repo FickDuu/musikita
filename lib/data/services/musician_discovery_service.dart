@@ -2,6 +2,9 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/musician.dart';
 import '../models/music_post.dart';
 import 'package:musikita/core/config/app_config.dart';
+import '../../core/exceptions/app_exception.dart';
+import '../../core/exceptions/firebase_exceptions.dart';
+import '../../core/services/logger_service.dart';
 
 /// Service for discovering and browsing other musicians
 class MusicianDiscoveryService {
@@ -10,38 +13,60 @@ class MusicianDiscoveryService {
   /// Get all musicians as a stream for real-time updates
   /// Excludes the current user
   Stream<List<Musician>> getMusiciansStream({String? excludeUserId}) {
-    try {
-      Query query = _firestore
-          .collection(AppConfig.musicPostsCollection)
-          .orderBy('createdAt', descending: true);
+    LoggerService.info(
+      'Setting up musicians stream${excludeUserId != null ? ' (excluding: $excludeUserId)' : ''}',
+      tag: 'MusicianDiscoveryService',
+    );
 
-      return query.snapshots().map((snapshot) {
-        return snapshot.docs
-            .map((doc) {
-          try {
-            final data = doc.data() as Map<String, dynamic>;
-            return Musician.fromJson({...data, 'id': doc.id});
-          } catch (e) {
-            throw Exception ('Error parsing musician ${doc.id}: $e');
-          }
-        })
-            .whereType<Musician>() // Filter out nulls
-            .where((musician) =>
-        excludeUserId == null || musician.id != excludeUserId)
-            .toList();
-      });
-    } catch (e) {
-      throw Exception('Failed to fetch musicians: $e');
-    }
+    Query query = _firestore
+        .collection(AppConfig.musiciansCollection)
+        .orderBy('createdAt', descending: true);
+
+    return query.snapshots().map((snapshot) {
+      final musicians = snapshot.docs
+          .map((doc) {
+        try {
+          final data = doc.data() as Map<String, dynamic>;
+          return Musician.fromJson({...data, 'id': doc.id});
+        } catch (e) {
+          LoggerService.error(
+            'Error parsing musician ${doc.id}',
+            tag: 'MusicianDiscoveryService',
+            exception: e,
+          );
+          return null;
+        }
+      })
+          .whereType<Musician>() // Filter out nulls
+          .where((musician) =>
+      excludeUserId == null || musician.id != excludeUserId)
+          .toList();
+
+      LoggerService.info(
+        'Received ${musicians.length} musicians',
+        tag: 'MusicianDiscoveryService',
+      );
+
+      return musicians;
+    });
   }
 
   /// Get a specific musician by ID
   Future<Musician?> getMusicianById(String musicianId) async {
     try {
+      LoggerService.info(
+        'Fetching musician: $musicianId',
+        tag: 'MusicianDiscoveryService',
+      );
+
       final doc =
       await _firestore.collection(AppConfig.musiciansCollection).doc(musicianId).get();
 
       if (!doc.exists) {
+        LoggerService.warning(
+          'Musician not found: $musicianId',
+          tag: 'MusicianDiscoveryService',
+        );
         return null;
       }
 
@@ -49,36 +74,49 @@ class MusicianDiscoveryService {
         ...doc.data() as Map<String, dynamic>,
         'id': doc.id,
       });
-    } catch (e) {
-      throw Exception('Failed to fetch musician: $e');
+    } catch (e, stackTrace) {
+      LoggerService.error(
+        'Error fetching musician: $musicianId',
+        tag: 'MusicianDiscoveryService',
+        exception: e,
+        stackTrace: stackTrace,
+      );
+      return null; // Non-critical - return null
     }
   }
 
   /// Get all music posts for a specific musician
   Stream<List<MusicPost>> getMusicianMusicStream(String musicianId) {
-    try {
-      return _firestore
-          .collection(AppConfig.musicPostsCollection)
-          .where('userId', isEqualTo: musicianId)
-          .orderBy('uploadedAt', descending: true)
-          .snapshots()
-          .map((snapshot) {
-        return snapshot.docs.map((doc) {
-          final data = doc.data();
-          return MusicPost.fromJson({
-            ...data,
-            'id': doc.id,
-          });
-        }).toList();
-      });
-    } catch (e) {
-      throw Exception('Failed to fetch musician music: $e');
-    }
+    LoggerService.info(
+      'Setting up music stream for musician: $musicianId',
+      tag: 'MusicianDiscoveryService',
+    );
+
+    return _firestore
+        .collection(AppConfig.musicPostsCollection)
+        .where('userId', isEqualTo: musicianId)
+        .orderBy('uploadedAt', descending: true)
+        .snapshots()
+        .map((snapshot) {
+      final posts = snapshot.docs.map((doc) {
+        final data = doc.data();
+        return MusicPost.fromJson({
+          ...data,
+          'id': doc.id,
+        });
+      }).toList();
+
+      LoggerService.info(
+        'Received ${posts.length} music posts for musician: $musicianId',
+        tag: 'MusicianDiscoveryService',
+      );
+
+      return posts;
+    });
   }
 
-  /// Search musicians by name or artist name
-  /// Note: This is a client-side filter since Firestore doesn't support
-  /// case-insensitive search. For production, consider using Algolia or similar.
+  // Search musicians by name or artist name
+  // Note: This is a client-side filter since Firestore doesn't support
   Stream<List<Musician>> searchMusicians(
       String query, {
         String? excludeUserId,
@@ -148,10 +186,28 @@ class MusicianDiscoveryService {
   /// Get total number of musicians
   Future<int> getMusicianCount() async {
     try {
+      LoggerService.info(
+        'Fetching musician count',
+        tag: 'MusicianDiscoveryService',
+      );
+
       final snapshot = await _firestore.collection(AppConfig.musiciansCollection).get();
-      return snapshot.docs.length;
-    } catch (e) {
-      throw Exception('Failed to get musician count: $e');
+      final count = snapshot.docs.length;
+
+      LoggerService.info(
+        'Total musicians: $count',
+        tag: 'MusicianDiscoveryService',
+      );
+
+      return count;
+    } catch (e, stackTrace) {
+      LoggerService.error(
+        'Error getting musician count',
+        tag: 'MusicianDiscoveryService',
+        exception: e,
+        stackTrace: stackTrace,
+      );
+      return 0; // Non-critical - return 0
     }
   }
 }

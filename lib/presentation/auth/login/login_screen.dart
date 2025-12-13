@@ -7,6 +7,8 @@ import '../../../core/widgets/app_background.dart';
 import '../../../core/utils/validators.dart';
 import '../../../data/services/auth_service.dart';
 import 'package:musikita/core/constants/app_dimensions.dart';
+import '../../../core/services/error_handler_service.dart';
+
 
 /// Login screen for existing users
 class LoginScreen extends StatefulWidget {
@@ -37,9 +39,7 @@ class _LoginScreenState extends State<LoginScreen> {
 
   Future<void> _handleLogin() async {
     if (!_formKey.currentState!.validate()) return;
-
     setState(() => _isLoading = true);
-
     try {
       final appUser = await _authService.signInWithEmailAndPassword(
         email: _emailController.text.trim(),
@@ -47,38 +47,27 @@ class _LoginScreenState extends State<LoginScreen> {
       );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${AppStrings.loginSuccess} Welcome, ${appUser.username}!'),
-            backgroundColor: AppColors.success,
-            duration: const Duration(seconds: 2),
-          ),
+        ErrorHandlerService.showSuccess(
+          context,
+          '${AppStrings.loginSuccess} Welcome, ${appUser.username}!',
         );
-        // Navigate to auth gate (will redirect to home)
         context.go('/auth');
       }
-    } on Exception catch (e) {
-      if (mounted) {
-        _showError(e.toString().replaceAll('Exception: ', ''));
+    } catch(e, stackTrace){
+      if(mounted){
+        ErrorHandlerService.handleError(
+          context,
+          e,
+          stackTrace: stackTrace,
+          tag: 'LoginScreen',
+        );
       }
-    } catch (e) {
-      if (mounted) {
-        _showError('An unexpected error occurred. Please try again.');
-      }
-    } finally {
-      if (mounted) {
+    }
+    finally{
+      if(mounted){
         setState(() => _isLoading = false);
       }
     }
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-      ),
-    );
   }
 
   @override
@@ -166,11 +155,9 @@ class _LoginScreenState extends State<LoginScreen> {
                     alignment: Alignment.centerRight,
                     child: TextButton(
                       onPressed: () {
-                        // TODO: Implement forgot password
-                        ScaffoldMessenger.of(context).showSnackBar(
-                          const SnackBar(
-                            content: Text('Forgot password feature coming soon!'),
-                          ),
+                        ErrorHandlerService.showInfo(
+                          context,
+                          'Forgot password coming soon.'
                         );
                       },
                       child: const Text(AppStrings.forgotPassword),

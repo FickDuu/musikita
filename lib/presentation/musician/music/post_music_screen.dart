@@ -10,6 +10,8 @@ import '../../../data/models/music_post.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_limits.dart';
 import '../../../core/config/app_config.dart';
+import '../../../core/services/error_handler_service.dart';
+import '../../../core/constants/error_messages.dart';
 
 /// Post music screen - for uploading new music
 class PostMusicScreen extends StatefulWidget {
@@ -54,9 +56,14 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
         final file = File(result.files.single.path!);
         final fileSize = await file.length();
 
-        // Check file size (10MB limit)
+        // Check file size using AppLimits
         if (fileSize > AppLimits.maxAudioSizeBytes) {
-          _showError('File size exceeds ${AppLimits.maxAudioSizeBytes ~/ (1024 * 1024)}10MB limit');
+          if (mounted) {
+            ErrorHandlerService.showWarning(
+              context,
+              'File size exceeds ${AppLimits.maxAudioSizeBytes ~/ (1024 * 1024)}MB limit',
+            );
+          }
           return;
         }
 
@@ -64,15 +71,28 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
           _selectedAudioFile = file;
         });
       }
-    } catch (e) {
-      _showError('Failed to pick file: ${e.toString()}');
+    } catch (e, stackTrace) {
+      if (mounted) {
+        ErrorHandlerService.handleError(
+          context,
+          e,
+          customMessage: ErrorMessages.filePickFailed,
+          stackTrace: stackTrace,
+          tag: 'PostMusicScreen',
+        );
+      }
     }
   }
 
   Future<void> _uploadMusic() async {
     if (!_formKey.currentState!.validate()) return;
+
+    // Validate file selection
     if (_selectedAudioFile == null) {
-      _showError('Please select an audio file');
+      ErrorHandlerService.showWarning(
+        context,
+        'Please select an audio file',
+      );
       return;
     }
 
@@ -109,12 +129,10 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
       setState(() => _uploadProgress = 1.0);
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Music uploaded successfully!'),
-            backgroundColor: AppColors.success,
-            duration: Duration(seconds: AppLimits.successSnackbarDurationSeconds),
-          ),
+        // Show success message
+        ErrorHandlerService.showSuccess(
+          context,
+          ErrorMessages.successMusicUploaded,
         );
 
         // Call the callback if provided
@@ -125,8 +143,16 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
           Navigator.pop(context);
         }
       }
-    } catch (e) {
-      _showError(e.toString());
+    } catch (e, stackTrace) {
+      if (mounted) {
+        // Use centralized error handler
+        ErrorHandlerService.handleError(
+          context,
+          e,
+          stackTrace: stackTrace,
+          tag: 'PostMusicScreen',
+        );
+      }
       setState(() {
         _isUploading = false;
         _uploadProgress = 0;
@@ -134,15 +160,6 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
     }
   }
 
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-        duration: Duration(seconds: AppLimits.errorSnackbarDurationSeconds),
-      ),
-    );
-  }
 
   @override
   Widget build(BuildContext context) {

@@ -10,6 +10,8 @@ import '../../../data/providers/auth_provider.dart';
 import '../../../data/services/profile_service.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_limits.dart';
+import '../../../core/services/error_handler_service.dart';
+import '../../../core/constants/error_messages.dart';
 
 /// Profile editing screen
 class EditProfileScreen extends StatefulWidget {
@@ -61,8 +63,16 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           _selectedImage = File(image.path);
         });
       }
-    } catch (e) {
-      _showError('Failed to pick image: ${e.toString()}');
+    } catch (e, stackTrace) {
+      if (mounted) {
+        ErrorHandlerService.handleError(
+          context,
+          e,
+          customMessage: ErrorMessages.filePickFailed,
+          stackTrace: stackTrace,
+          tag: 'EditProfileScreen',
+        );
+      }
     }
   }
 
@@ -100,32 +110,28 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       await authProvider.refreshUserData();
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(
-            content: Text('Profile updated successfully!'),
-            backgroundColor: AppColors.success,
-            duration: Duration(seconds: AppLimits.snackbarDurationSeconds),
-          ),
+        // Show success message
+        ErrorHandlerService.showSuccess(
+          context,
+          ErrorMessages.successProfileUpdated,
         );
         context.pop();
       }
-    } catch (e) {
-      _showError('Failed to update profile: ${e.toString()}');
+    } catch (e, stackTrace) {
+      if (mounted) {
+        // Use centralized error handler
+        ErrorHandlerService.handleError(
+          context,
+          e,
+          stackTrace: stackTrace,
+          tag: 'EditProfileScreen',
+        );
+      }
     } finally {
       if (mounted) {
         setState(() => _isLoading = false);
       }
     }
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-        duration: Duration(seconds: AppLimits.errorSnackbarDurationSeconds),
-      ),
-    );
   }
 
   @override

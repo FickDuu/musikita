@@ -8,6 +8,8 @@ import '../../../core/utils/validators.dart';
 import '../../../data/models/user_role.dart';
 import '../../../data/services/auth_service.dart';
 import '../../common/widgets/role_selection_card.dart';
+import '../../../core/services/error_handler_service.dart';
+import '../../../core/constants/error_messages.dart';
 
 /// Registration screen with role selection
 class RegisterScreen extends StatefulWidget {
@@ -45,7 +47,10 @@ class _RegisterScreenState extends State<RegisterScreen> {
   Future<void> _handleRegister() async {
     if (!_formKey.currentState!.validate()) return;
     if (_selectedRole == null) {
-      _showError('Please select your role');
+      ErrorHandlerService.showWarning(
+        context,
+        'Please select your role (Musician or Organizer)',
+      );
       return;
     }
 
@@ -60,38 +65,28 @@ class _RegisterScreenState extends State<RegisterScreen> {
       );
 
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(
-            content: Text('${AppStrings.registrationSuccess} Welcome, ${appUser.username}!'),
-            backgroundColor: AppColors.success,
-            duration: const Duration(seconds: 2),
-          ),
+        ErrorHandlerService.showSuccess(
+          context,
+          '${AppStrings.registrationSuccess} Welcome, ${appUser.username}!',
         );
         // Navigate to auth gate (will redirect to home)
         context.go('/auth');
       }
-    } on Exception catch (e) {
-      if (mounted) {
-        _showError(e.toString().replaceAll('Exception: ', ''));
+    } catch (e, stackTrace){
+      if(mounted){
+        ErrorHandlerService.handleError(
+          context,
+          e,
+          stackTrace: stackTrace,
+          tag: 'RegisterScreen',
+        );
       }
-    } catch (e) {
-      if (mounted) {
-        _showError('Registration failed. Please try again.');
-      }
-    } finally {
-      if (mounted) {
+    }
+    finally{
+      if(mounted){
         setState(() => _isLoading = false);
       }
     }
-  }
-
-  void _showError(String message) {
-    ScaffoldMessenger.of(context).showSnackBar(
-      SnackBar(
-        content: Text(message),
-        backgroundColor: AppColors.error,
-      ),
-    );
   }
 
   @override
