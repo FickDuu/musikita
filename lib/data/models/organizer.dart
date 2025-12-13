@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../core/config/app_config.dart';
 
 //organizer model
 class Organizer {
@@ -92,7 +93,5 @@ class Organizer {
 
 //business type
 class BusinessTypes{
-  static const List<String> types = [
-    'Venue', 'Event Agency', 'Festival Organizer', 'Corporate Events', 'Wedding Planner', 'Concert Promoter', 'Bar/Restaurant', 'CLub/Nightclub', 'Private Events', 'Other',
-  ];
+  static const List<String> types = AppConfig.businessTypes;
 }

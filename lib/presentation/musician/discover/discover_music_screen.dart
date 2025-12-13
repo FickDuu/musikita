@@ -4,6 +4,8 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../data/models/music_post.dart';
 import '../home/widgets/music_player_card.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
+import 'package:musikita/core/config/app_config.dart';
 
 /// Discover music screen - Browse music from all musicians
 class DiscoverMusicScreen extends StatefulWidget {
@@ -37,7 +39,7 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
   Widget _buildMusicFeed() {
     return StreamBuilder<QuerySnapshot>(
       stream: _firestore
-          .collection('music_posts')
+          .collection(AppConfig.musicPostsCollection)
           .where('userId', isNotEqualTo: widget.userId) // Exclude own music
           .orderBy('userId') // Required for isNotEqualTo
           .orderBy('uploadedAt', descending: true)
@@ -54,10 +56,10 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
 
         // Error state
         if (snapshot.hasError) {
-          print('FIRESTORE ERROR: ${snapshot.error}');
+          debugPrint('FIRESTORE ERROR: ${snapshot.error}');
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -66,19 +68,19 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
                     size: 64,
                     color: AppColors.error.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   Text(
                     'Error loading music',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: AppColors.error,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     'Please try again later',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   ElevatedButton.icon(
                     onPressed: () => setState(() {}),
                     icon: const Icon(Icons.refresh),
@@ -99,7 +101,7 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
               'id': doc.id,
             });
           } catch (e) {
-            print('Error parsing music post ${doc.id}: $e');
+            debugPrint('Error parsing music post ${doc.id}: $e');
             return null;
           }
         }).whereType<MusicPost>().toList();
@@ -117,12 +119,12 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
                     size: 80,
                     color: AppColors.grey.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingLarge),
                   Text(
                     'No Music Yet',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     'Be the first to share your music!\nOther musicians\' posts will appear here.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -144,12 +146,12 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
           },
           color: AppColors.primary,
           child: ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             itemCount: musicPosts.length,
             itemBuilder: (context, index) {
               final post = musicPosts[index];
               return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.only(bottom: AppDimensions.spacingMedium),
                 child: MusicPlayerCard(
                   musicPost: post,
                   showArtistName: true, // Show artist name for discovery

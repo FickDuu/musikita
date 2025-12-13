@@ -2,9 +2,10 @@ import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../data/models/event.dart';
-import '../../../../data/models/organizer.dart';
 import '../../../../data/services/organizer_service.dart';
 import '../../home/organizer_home_screen.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_limits.dart';
 
 /// Event card for organizer's discover events screen
 /// Shows event details with clickable organizer name to view their profile
@@ -26,18 +27,18 @@ class OrganizerEventCard extends StatelessWidget {
           content: Row(
             children: [
               SizedBox(
-                width: 16,
-                height: 16,
+                width: AppDimensions.progressIndicatorSmall,
+                height: AppDimensions.progressIndicatorSmall,
                 child: CircularProgressIndicator(
-                  strokeWidth: 2,
+                  strokeWidth: AppDimensions.progressIndicatorStroke,
                   color: Colors.white,
                 ),
               ),
-              SizedBox(width: 12),
+              SizedBox(width: AppDimensions.spacingSmall),
               Text('Loading organizer profile...'),
             ],
           ),
-          duration: Duration(seconds: 1),
+          duration: Duration(seconds: AppLimits.snackbarDurationSeconds),
         ),
       );
 
@@ -50,6 +51,7 @@ class OrganizerEventCard extends StatelessWidget {
             const SnackBar(
               content: Text('Could not load organizer profile'),
               backgroundColor: AppColors.error,
+              duration: Duration(seconds: AppLimits.errorSnackbarDurationSeconds),
             ),
           );
         }
@@ -85,15 +87,15 @@ class OrganizerEventCard extends StatelessWidget {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         border: isOwnEvent
-            ? Border.all(color: AppColors.primary, width: 2)
+            ? Border.all(color: AppColors.primary, width: AppDimensions.borderWidthThick)
             : null,
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: AppDimensions.cardShadowBlur,
+            offset: const Offset(0, AppDimensions.cardShadowOffsetY),
           ),
         ],
       ),
@@ -102,22 +104,22 @@ class OrganizerEventCard extends StatelessWidget {
         children: [
           // Event header
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(16),
+                top: Radius.circular(AppDimensions.radiusLarge),
               ),
             ),
             child: Row(
               children: [
                 // Date badge
                 Container(
-                  width: 60,
-                  height: 60,
+                  width: AppDimensions.eventDateBadgeSize,
+                  height: AppDimensions.eventDateBadgeSize,
                   decoration: BoxDecoration(
                     color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -143,7 +145,7 @@ class OrganizerEventCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppDimensions.spacingMedium),
 
                 // Event name and venue
                 Expanded(
@@ -159,7 +161,7 @@ class OrganizerEventCard extends StatelessWidget {
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacingXSmall),
                       Row(
                         children: [
                           const Icon(
@@ -167,7 +169,7 @@ class OrganizerEventCard extends StatelessWidget {
                             size: 14,
                             color: AppColors.textSecondary,
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppDimensions.spacingXSmall),
                           Expanded(
                             child: Text(
                               event.venueName,
@@ -191,12 +193,12 @@ class OrganizerEventCard extends StatelessWidget {
                 if (isOwnEvent)
                   Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 8,
+                      horizontal: AppDimensions.spacingSmall,
                       vertical: 4,
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary,
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                     ),
                     child: const Text(
                       'Your Event',
@@ -213,7 +215,7 @@ class OrganizerEventCard extends StatelessWidget {
 
           // Event details
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -247,21 +249,21 @@ class OrganizerEventCard extends StatelessWidget {
                     ],
                   ),
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Time
                 _buildInfoRow(
                   Icons.access_time,
                   event.formattedTimeRange,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Location
                 _buildInfoRow(
                   Icons.location_on,
                   event.location,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Payment
                 _buildInfoRow(
@@ -270,7 +272,7 @@ class OrganizerEventCard extends StatelessWidget {
                   valueColor: AppColors.primary,
                   valueBold: true,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Slots
                 _buildInfoRow(
@@ -283,19 +285,19 @@ class OrganizerEventCard extends StatelessWidget {
 
                 // Genres
                 if (event.genres.isNotEmpty) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+                    spacing: AppDimensions.spacingSmall,
+                    runSpacing: AppDimensions.spacingSmall,
                     children: event.genres.map((genre) {
                       return Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
+                          horizontal: AppDimensions.spacingSmall,
                           vertical: 6,
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                         ),
                         child: Text(
                           genre,
@@ -312,17 +314,17 @@ class OrganizerEventCard extends StatelessWidget {
 
                 // Description
                 if (event.description.isNotEmpty) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppDimensions.spacingSmall),
                     decoration: BoxDecoration(
                       color: AppColors.greyLight.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
                     ),
                     child: Text(
                       event.description,
                       style: Theme.of(context).textTheme.bodySmall,
-                      maxLines: 3,
+                      maxLines: AppLimits.descriptionPreviewMaxLines,
                       overflow: TextOverflow.ellipsis,
                     ),
                   ),
@@ -348,7 +350,7 @@ class OrganizerEventCard extends StatelessWidget {
           size: 18,
           color: AppColors.textSecondary,
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppDimensions.spacingSmall),
         Expanded(
           child: Text(
             value,

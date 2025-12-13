@@ -5,6 +5,7 @@ import '../../../data/models/organizer.dart';
 import '../../../data/models/event.dart';
 import '../../../data/services/event_service.dart';
 import 'package:intl/intl.dart';
+import '../../../core/constants/app_dimensions.dart';
 
 /// Screen to view another organizer's profile
 /// Shows organizer info and their created events
@@ -36,7 +37,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
           child: Column(
             children: [
               _buildProfileHeader(),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppDimensions.spacingLarge),
               _buildEventsSection(),
             ],
           ),
@@ -51,12 +52,12 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
       padding: const EdgeInsets.all(24),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: AppDimensions.cardShadowBlur,
+            offset: Offset(0, AppDimensions.cardShadowOffsetY),
           ),
         ],
       ),
@@ -76,7 +77,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
               color: AppColors.primary,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacingMedium),
 
           // Organizer name
           Text(
@@ -86,7 +87,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
             ),
             textAlign: TextAlign.center,
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingSmall),
 
           // Company name
           if (widget.organizer.companyName != null &&
@@ -112,7 +113,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
           // Contact number
           if (widget.organizer.contactNumber != null &&
               widget.organizer.contactNumber!.isNotEmpty) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingSmall),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -135,7 +136,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
           // Location
           if (widget.organizer.location != null &&
               widget.organizer.location!.isNotEmpty) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingSmall),
             Row(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
@@ -158,7 +159,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
           // Business type
           if (widget.organizer.businessType != null &&
               widget.organizer.businessType!.isNotEmpty) ...[
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingSmall),
             Container(
               padding: const EdgeInsets.symmetric(
                 horizontal: 12,
@@ -166,7 +167,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
               ),
               decoration: BoxDecoration(
                 color: AppColors.primary.withValues(alpha: 0.1),
-                borderRadius: BorderRadius.circular(12),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
               ),
               child: Text(
                 widget.organizer.businessType!,
@@ -182,9 +183,9 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
           // Bio
           if (widget.organizer.bio != null &&
               widget.organizer.bio!.isNotEmpty) ...[
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacingMedium),
             const Divider(),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacingMedium),
             Text(
               widget.organizer.bio!,
               style: Theme.of(context).textTheme.bodyMedium,
@@ -208,7 +209,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
               fontWeight: FontWeight.bold,
             ),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacingMedium),
           _buildEventsList(),
         ],
       ),
@@ -239,7 +240,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                     size: 48,
                     color: AppColors.error,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     'Error loading events',
                     style: Theme.of(context).textTheme.bodyMedium,
@@ -263,12 +264,12 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                     size: 64,
                     color: AppColors.grey.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   Text(
                     'No events yet',
                     style: Theme.of(context).textTheme.titleMedium,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     'This organizer hasn\'t created any events',
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -297,12 +298,12 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
       margin: const EdgeInsets.only(bottom: 16),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: AppDimensions.cardShadowBlur,
+            offset: Offset(0, AppDimensions.cardShadowOffsetY),
           ),
         ],
       ),
@@ -330,7 +331,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                         : isFull
                         ? AppColors.error
                         : AppColors.primary,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -349,14 +350,14 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                         event.eventDate.day.toString(),
                         style: const TextStyle(
                           color: AppColors.white,
-                          fontSize: 24,
+                          fontSize: AppDimensions.iconMedium,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppDimensions.spacingMedium),
 
                 // Event name and venue
                 Expanded(
@@ -412,7 +413,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                         : isFull
                         ? AppColors.error
                         : AppColors.success,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                   ),
                   child: Text(
                     isPastEvent
@@ -442,14 +443,14 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                   Icons.access_time,
                   event.formattedTimeRange,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Location
                 _buildInfoRow(
                   Icons.location_on,
                   event.location,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Payment
                 _buildInfoRow(
@@ -458,7 +459,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                   valueColor: AppColors.primary,
                   valueBold: true,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Slots
                 _buildInfoRow(
@@ -471,7 +472,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
 
                 // Genres
                 if (event.genres.isNotEmpty) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Wrap(
                     spacing: 8,
                     runSpacing: 8,
@@ -483,7 +484,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                         ),
                         child: Text(
                           genre,
@@ -500,7 +501,7 @@ class _OrganizerProfileScreenState extends State<OrganizerProfileScreen> {
 
                 // Description
                 if (event.description.isNotEmpty) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Container(
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(

@@ -9,7 +9,8 @@ import '../../../data/models/event_application.dart';
 import '../../../data/services/musician_discovery_service.dart';
 import '../../../data/services/event_service.dart';
 import '../home/widgets/music_player_card.dart';
-
+import '../../../core/constants/app_dimensions.dart';
+import '../../../core/constants/app_limits.dart';
 /// Full musician profile screen
 /// Uses same layout as your own profile but view-only
 class MusicianProfileScreen extends StatefulWidget {
@@ -37,7 +38,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
   bool _isLoading = true;
   String? _error;
   bool _isHeaderCollapsed = false;
-  static const double _collapseThreshold = 200.0;
+  static const double _collapseThreshold = AppDimensions.headerCollapseThreshold;
 
   @override
   void initState() {
@@ -111,7 +112,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
         body: AppBackground(
           child: Center(
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -120,13 +121,13 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                     size: 64,
                     color: AppColors.error.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   Text(
                     _error ?? 'Musician not found',
                     style: Theme.of(context).textTheme.titleLarge,
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingLarge),
                   ElevatedButton.icon(
                     onPressed: () => Navigator.pop(context),
                     icon: const Icon(Icons.arrow_back),
@@ -148,7 +149,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
             return [
               // Collapsible Profile Header (same as yours!)
               SliverAppBar(
-                expandedHeight: 300,
+                expandedHeight: AppDimensions.headerExpandedHeight,
                 floating: false,
                 pinned: true,
                 backgroundColor: AppColors.primary,
@@ -160,7 +161,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                     _musician!.artistName ?? 'Unknown Artist',
                     style: const TextStyle(
                       fontFamily: AppTheme.artistUsernameFont,
-                      fontSize: 20,
+                      fontSize: AppDimensions.iconSmall,
                       fontWeight: FontWeight.bold,
                       color: AppColors.white,
                     ),
@@ -179,9 +180,9 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                     labelColor: AppColors.primary,
                     unselectedLabelColor: AppColors.grey,
                     tabs: const [
-                      Tab(icon: Icon(Icons.music_note, size: 28)),
-                      Tab(icon: Icon(Icons.calendar_today, size: 28)), // Back to calendar icon
-                      Tab(icon: Icon(Icons.analytics, size: 28)),
+                      Tab(icon: Icon(Icons.music_note, size: AppDimensions.tabIconSize)),
+                      Tab(icon: Icon(Icons.calendar_today, size: AppDimensions.tabIconSize)), // Back to calendar icon
+                      Tab(icon: Icon(Icons.analytics, size: AppDimensions.tabIconSize)),
                     ],
                   ),
                 ),
@@ -226,9 +227,9 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
 
         // Artist Name and Bio Overlay (same as your profile!)
         Positioned(
-          left: 24,
-          right: 24,
-          bottom: 24,
+          left: AppDimensions.spacingLarge,
+          right: AppDimensions.spacingLarge,
+          bottom: AppDimensions.spacingLarge,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -252,7 +253,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingSmall),
 
               // Bio
               Text(
@@ -348,7 +349,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
         if (snapshot.hasError) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -357,7 +358,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                     size: 64,
                     color: AppColors.error.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   const Text('Error loading music'),
                 ],
               ),
@@ -370,7 +371,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
         if (musicPosts.isEmpty) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -379,12 +380,12 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                     size: 80,
                     color: AppColors.grey.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingLarge),
                   Text(
                     'No music yet',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     'This artist hasn\'t uploaded any music',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -432,7 +433,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
         if (snapshot.hasError) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -441,7 +442,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                     size: 64,
                     color: AppColors.error.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   const Text('Error loading events'),
                 ],
               ),
@@ -461,7 +462,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
         if (futureApplications.isEmpty) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -470,12 +471,12 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                     size: 80,
                     color: AppColors.grey.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingLarge),
                   Text(
                     'No Upcoming Events',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     'This artist is available for bookings!',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -483,7 +484,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingLarge),
                   ElevatedButton.icon(
                     onPressed: () {
                       ScaffoldMessenger.of(context).showSnackBar(
@@ -525,7 +526,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                     margin: const EdgeInsets.only(bottom: 12),
                     decoration: BoxDecoration(
                       color: AppColors.white,
-                      borderRadius: BorderRadius.circular(16),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
                     ),
                     child: const Center(
                       child: CircularProgressIndicator(
@@ -558,7 +559,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
       margin: const EdgeInsets.only(bottom: 12),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         border: Border.all(
           color: AppColors.success.withValues(alpha: 0.3),
           width: 2,
@@ -566,7 +567,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
-            blurRadius: 8,
+            blurRadius: AppDimensions.cardShadowBlur,
             offset: const Offset(0, 2),
           ),
         ],
@@ -620,7 +621,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingSmall),
 
             // Venue
             Row(
@@ -630,7 +631,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                   size: 16,
                   color: AppColors.textSecondary,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingSmall),
                 Expanded(
                   child: Text(
                     event.venueName,
@@ -641,7 +642,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingSmall),
 
             // Date and time
             Row(
@@ -651,7 +652,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                   size: 16,
                   color: AppColors.textSecondary,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingSmall),
                 Text(
                   event.formattedDate,
                   style: Theme.of(context).textTheme.bodyMedium,
@@ -662,14 +663,14 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                   size: 16,
                   color: AppColors.textSecondary,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingSmall),
                 Text(
                   event.formattedTimeRange,
                   style: Theme.of(context).textTheme.bodyMedium,
                 ),
               ],
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingSmall),
 
             // Location
             Row(
@@ -679,7 +680,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                   size: 16,
                   color: AppColors.textSecondary,
                 ),
-                const SizedBox(width: 8),
+                const SizedBox(width: AppDimensions.spacingSmall),
                 Expanded(
                   child: Text(
                     event.location,
@@ -712,16 +713,16 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingSmall),
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppDimensions.spacingMedium + 4),
               decoration: BoxDecoration(
                 color: AppColors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.shadow,
-                    blurRadius: 8,
+                    blurRadius: AppDimensions.cardShadowBlur,
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -733,7 +734,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                 ),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingLarge),
           ],
 
           // Experience
@@ -744,16 +745,16 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingSmall),
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: AppColors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.shadow,
-                    blurRadius: 8,
+                    blurRadius: AppDimensions.cardShadowBlur,
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -764,12 +765,12 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                     padding: const EdgeInsets.all(12),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                     ),
                     child: const Icon(
                       Icons.work,
                       color: AppColors.primary,
-                      size: 28,
+                      size: AppDimensions.tabIconSize,
                     ),
                   ),
                   const SizedBox(width: 16),
@@ -784,7 +785,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingLarge),
           ],
 
           // Genres
@@ -795,16 +796,16 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingSmall),
             Container(
               padding: const EdgeInsets.all(20),
               decoration: BoxDecoration(
                 color: AppColors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.shadow,
-                    blurRadius: 8,
+                    blurRadius: AppDimensions.cardShadowBlur,
                     offset: const Offset(0, 2),
                   ),
                 ],
@@ -815,12 +816,12 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                 children: _musician!.genres.map((genre) {
                   return Container(
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 8,
+                      horizontal: AppDimensions.spacingMedium,
+                      vertical: AppDimensions.spacingSmall,
                     ),
                     decoration: BoxDecoration(
                       color: AppColors.primary.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(20),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusXLarge),
                       border: Border.all(
                         color: AppColors.primary.withValues(alpha: 0.3),
                       ),
@@ -837,7 +838,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                 }).toList(),
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingLarge),
           ],
 
           // Contact Info
@@ -848,17 +849,17 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                 fontWeight: FontWeight.bold,
               ),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingSmall),
             Container(
-              padding: const EdgeInsets.all(20),
+              padding: const EdgeInsets.all(AppDimensions.cardPadding),
               decoration: BoxDecoration(
                 color: AppColors.white,
-                borderRadius: BorderRadius.circular(16),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
                 boxShadow: [
                   BoxShadow(
                     color: AppColors.shadow,
-                    blurRadius: 8,
-                    offset: const Offset(0, 2),
+                    blurRadius: AppDimensions.cardShadowBlur,
+                    offset: const Offset(0, AppDimensions.cardShadowOffsetY),
                   ),
                 ],
               ),
@@ -870,9 +871,9 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                         const Icon(
                           Icons.location_on,
                           color: AppColors.primary,
-                          size: 24,
+                          size: AppDimensions.iconMedium,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppDimensions.spacingSmall),
                         Expanded(
                           child: Text(
                             _musician!.location!,
@@ -883,7 +884,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                     ),
                   ],
                   if (_musician!.contactNumber != null) ...[
-                    if (_musician!.location != null) const SizedBox(height: 16),
+                    if (_musician!.location != null) const SizedBox(height: AppDimensions.spacingMedium),
                     Row(
                       children: [
                         const Icon(
@@ -891,7 +892,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                           color: AppColors.primary,
                           size: 24,
                         ),
-                        const SizedBox(width: 12),
+                        const SizedBox(width: AppDimensions.spacingSmall),
                         Expanded(
                           child: Text(
                             _musician!.contactNumber!,
@@ -904,7 +905,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                 ],
               ),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingLarge),
           ],
 
           // Message CTA
@@ -915,6 +916,7 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
                   const SnackBar(
                     content: Text('Messaging feature coming in Phase 5!'),
                     backgroundColor: AppColors.primary,
+                    duration: Duration(seconds: AppLimits.errorSnackbarDurationSeconds),
                   ),
                 );
               },
@@ -923,8 +925,8 @@ class _MusicianProfileScreenState extends State<MusicianProfileScreen>
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppColors.primary,
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 32,
-                  vertical: 16,
+                  horizontal: AppDimensions.spacingXLarge,
+                  vertical: AppDimensions.spacingMedium,
                 ),
               ),
             ),

@@ -4,6 +4,7 @@ import '../../core/constants/app_assets.dart';
 import '../../core/constants/app_colors.dart';
 import '../../core/constants/app_strings.dart';
 import '../../core/widgets/app_background.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
 
 /// Welcome screen with tiled logo background
 /// Entry point after splash screen
@@ -16,7 +17,7 @@ class WelcomeScreen extends StatelessWidget {
       body: AppBackground(
         child: SafeArea(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(AppDimensions.spacingLarge),
             child: Column(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
@@ -32,7 +33,7 @@ class WelcomeScreen extends StatelessWidget {
                       width: MediaQuery.of(context).size.width * 0.6,
                       fit: BoxFit.contain,
                     ),
-                    const SizedBox(height: 32),
+                    const SizedBox(height: AppDimensions.spacingXLarge),
 
                     // Title
                     Text(
@@ -43,7 +44,7 @@ class WelcomeScreen extends StatelessWidget {
                       ),
                       textAlign: TextAlign.center,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppDimensions.spacingMedium),
 
                     // Subtitle
                     Text(
@@ -69,7 +70,7 @@ class WelcomeScreen extends StatelessWidget {
                         child: const Text(AppStrings.getStarted),
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppDimensions.spacingMedium),
 
                     // Login text
                     Row(
@@ -88,7 +89,7 @@ class WelcomeScreen extends StatelessWidget {
                   ],
                 ),
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacingMedium),
               ],
             ),
           ),

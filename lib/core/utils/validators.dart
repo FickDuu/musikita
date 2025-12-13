@@ -1,5 +1,6 @@
 //input validation utils - reusable for forms
 import 'package:musikita/core/constants/app_strings.dart';
+import 'package:musikita/core/constants/app_limits.dart';
 
 class Validators {
   Validators._();
@@ -23,8 +24,8 @@ class Validators {
     if(value == null || value.isEmpty){
       return AppStrings.fieldRequired;
     }
-    if(value.length < 6){
-      return AppStrings.passwordTooShort;
+    if(value.length < AppLimits.passwordMinLength){
+      return 'Password must be at least ${AppLimits.passwordMinLength} characters';
     }
     return null;
   }

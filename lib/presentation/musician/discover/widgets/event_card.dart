@@ -5,6 +5,7 @@ import '../../../../data/models/event.dart';
 import '../../../../data/services/event_service.dart';
 import 'package:provider/provider.dart';
 import '../../../../data/providers/auth_provider.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
 
 /// Event card widget - displays event details with apply functionality
 class EventCard extends StatefulWidget {
@@ -39,14 +40,14 @@ class _EventCardState extends State<EventCard> {
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Event: ${widget.event.eventName}'),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingSmall),
             Text('Date: ${widget.event.formattedDate}'),
             Text('Time: ${widget.event.formattedTimeRange}'),
             Text('Payment: ${widget.event.formattedPayment}'),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.radiusMedium),
             const Text(
               'Your application will be sent to the organizer.',
-              style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
+              style: TextStyle (fontSize: AppDimensions.fontSmall, color:AppColors.textSecondary),
             ),
           ],
         ),
@@ -112,12 +113,12 @@ class _EventCardState extends State<EventCard> {
     return Container(
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: AppDimensions.cardShadowBlur,
+            offset: const Offset(0, AppDimensions.cardShadowOffsetY),
           ),
         ],
       ),
@@ -126,22 +127,22 @@ class _EventCardState extends State<EventCard> {
         children: [
           // Event header
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(16),
+                top: Radius.circular(AppDimensions.radiusLarge),
               ),
             ),
             child: Row(
               children: [
                 // Date badge
                 Container(
-                  width: 60,
-                  height: 60,
+                  width: AppDimensions.eventDateBadgeSize,
+                  height: AppDimensions.eventDateBadgeSize,
                   decoration: BoxDecoration(
                     color: AppColors.primary,
-                    borderRadius: BorderRadius.circular(12),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                   ),
                   child: Column(
                     mainAxisAlignment: MainAxisAlignment.center,
@@ -150,7 +151,7 @@ class _EventCardState extends State<EventCard> {
                         DateFormat('MMM').format(widget.event.eventDate).toUpperCase(),
                         style: const TextStyle(
                           color: AppColors.white,
-                          fontSize: 12,
+                          fontSize: AppDimensions.fontSmall,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
@@ -158,14 +159,14 @@ class _EventCardState extends State<EventCard> {
                         widget.event.eventDate.day.toString(),
                         style: const TextStyle(
                           color: AppColors.white,
-                          fontSize: 24,
+                          fontSize: AppDimensions.iconMedium,
                           fontWeight: FontWeight.bold,
                         ),
                       ),
                     ],
                   ),
                 ),
-                const SizedBox(width: 16),
+                const SizedBox(width: AppDimensions.spacingMedium),
 
                 // Event name and venue
                 Expanded(
@@ -188,7 +189,7 @@ class _EventCardState extends State<EventCard> {
                             size: 14,
                             color: AppColors.textSecondary,
                           ),
-                          const SizedBox(width: 4),
+                          const SizedBox(width: AppDimensions.spacingXSmall),
                           Expanded(
                             child: Text(
                               widget.event.venueName,
@@ -210,7 +211,7 @@ class _EventCardState extends State<EventCard> {
 
           // Event details
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -219,14 +220,14 @@ class _EventCardState extends State<EventCard> {
                   Icons.access_time,
                   widget.event.formattedTimeRange,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Location
                 _buildInfoRow(
                   Icons.location_on,
                   widget.event.location,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Payment
                 _buildInfoRow(
@@ -235,7 +236,7 @@ class _EventCardState extends State<EventCard> {
                   valueColor: AppColors.primary,
                   valueBold: true,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Slots
                 _buildInfoRow(
@@ -248,25 +249,25 @@ class _EventCardState extends State<EventCard> {
 
                 // Genres
                 if (widget.event.genres.isNotEmpty) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.radiusMedium),
                   Wrap(
-                    spacing: 8,
-                    runSpacing: 8,
+                    spacing: AppDimensions.spacingSmall,
+                    runSpacing: AppDimensions.spacingSmall,
                     children: widget.event.genres.map((genre) {
                       return Container(
                         padding: const EdgeInsets.symmetric(
-                          horizontal: 12,
-                          vertical: 6,
+                          horizontal: AppDimensions.radiusMedium,
+                          vertical: AppDimensions.spacingSmall - 2,
                         ),
                         decoration: BoxDecoration(
                           color: AppColors.primary.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                         ),
                         child: Text(
                           genre,
                           style: const TextStyle(
                             color: AppColors.primary,
-                            fontSize: 12,
+                            fontSize: AppDimensions.fontSmall,
                             fontWeight: FontWeight.w500,
                           ),
                         ),
@@ -275,12 +276,12 @@ class _EventCardState extends State<EventCard> {
                   ),
                 ],
 
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacingMedium),
 
                 // Apply button
                 SizedBox(
                   width: double.infinity,
-                  height: 48,
+                  height: AppDimensions.buttonHeight,
                   child: ElevatedButton(
                     onPressed: _isApplying ? null : _applyToEvent,
                     style: ElevatedButton.styleFrom(
@@ -289,8 +290,8 @@ class _EventCardState extends State<EventCard> {
                     ),
                     child: _isApplying
                         ? const SizedBox(
-                      height: 20,
-                      width: 20,
+                      height: AppDimensions.progressIndicatorSmall + 4,
+                      width: AppDimensions.progressIndicatorSmall + 4,
                       child: CircularProgressIndicator(
                         strokeWidth: 2,
                         color: AppColors.white,
@@ -299,7 +300,7 @@ class _EventCardState extends State<EventCard> {
                         : const Text(
                       'Apply to Event',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: AppDimensions.fontMedium + 1,
                         fontWeight: FontWeight.bold,
                       ),
                     ),
@@ -323,10 +324,10 @@ class _EventCardState extends State<EventCard> {
       children: [
         Icon(
           icon,
-          size: 18,
+          size: AppDimensions.iconSmall + 2,
           color: AppColors.textSecondary,
         ),
-        const SizedBox(width: 8),
+        const SizedBox(width: AppDimensions.spacingSmall),
         Expanded(
           child: Text(
             value,

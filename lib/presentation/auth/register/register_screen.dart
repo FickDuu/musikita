@@ -1,12 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../core/utils/validators.dart';
 import '../../../data/models/user_role.dart';
 import '../../../data/services/auth_service.dart';
-import 'common/widgets/role_selection_card.dart';
+import '../../common/widgets/role_selection_card.dart';
 
 /// Registration screen with role selection
 class RegisterScreen extends StatefulWidget {
@@ -106,13 +107,13 @@ class _RegisterScreenState extends State<RegisterScreen> {
       body: AppBackground(
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(AppDimensions.spacingLarge),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Role Selection
                   Text(
@@ -120,21 +121,21 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     style: Theme.of(context).textTheme.headlineSmall,
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   RoleSelectionCard(
                     role: UserRole.musician,
                     isSelected: _selectedRole == UserRole.musician,
                     onTap: () => setState(() => _selectedRole = UserRole.musician),
                   ),
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.radiusMedium),
 
                   RoleSelectionCard(
                     role: UserRole.organizer,
                     isSelected: _selectedRole == UserRole.organizer,
                     onTap: () => setState(() => _selectedRole = UserRole.organizer),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spacingXLarge),
 
                   // Username Field
                   TextFormField(
@@ -150,7 +151,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     validator: Validators.username,
                     textInputAction: TextInputAction.next,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Email Field
                   TextFormField(
@@ -163,7 +164,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     validator: Validators.email,
                     textInputAction: TextInputAction.next,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Password Field
                   TextFormField(
@@ -184,7 +185,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     validator: Validators.password,
                     textInputAction: TextInputAction.next,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Confirm Password Field
                   TextFormField(
@@ -210,26 +211,26 @@ class _RegisterScreenState extends State<RegisterScreen> {
                     textInputAction: TextInputAction.done,
                     onFieldSubmitted: (_) => _handleRegister(),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spacingXLarge),
 
                   // Register Button
                   SizedBox(
-                    height: 56,
+                    height: AppDimensions.buttonHeightLarge,
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _handleRegister,
                       child: _isLoading
                           ? const SizedBox(
-                        height: 24,
-                        width: 24,
+                        height: AppDimensions.progressIndicatorMedium,
+                        width: AppDimensions.progressIndicatorMedium,
                         child: CircularProgressIndicator(
-                          strokeWidth: 2,
+                          strokeWidth: AppDimensions.progressIndicatorStroke,
                           color: AppColors.white,
                         ),
                       )
                           : const Text(AppStrings.signUp),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Login Link
                   Row(

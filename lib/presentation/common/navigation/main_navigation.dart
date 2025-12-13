@@ -1,15 +1,16 @@
 import 'package:flutter/material.dart';
-import '../../core/constants/app_colors.dart';
-import '../../data/models/user_role.dart';
-import '../musician/home/widgets/musician_home_screen.dart';
-import '../musician/discover_music/discover_music_screen.dart';
-import '../musician/discover_events/discover_events_screen.dart';
-import '../musician/post_music/post_music_screen.dart';
-import '../musician/messages/messages_screen.dart';
-import '../organizer/home/organizer_home_screen.dart';
-import '../organizer/discover_music/organizer_discover_music_screen.dart';
-import '../organizer/discover_events/organizer_discover_events_screen.dart';
-import '../organizer/create_event/create_event_screen.dart';
+import '../../../core/constants/app_colors.dart';
+import '../../../data/models/user_role.dart';
+import '../../musician/home/musician_home_screen.dart';
+import '../../musician/discover/discover_music_screen.dart';
+import '../../musician/discover/discover_events_screen.dart';
+import '../../musician/music/post_music_screen.dart';
+import '../../musician/messages/messages_screen.dart';
+import '../../organizer/home/organizer_home_screen.dart';
+import '../../organizer/discover/organizer_discover_music_screen.dart';
+import '../../organizer/discover/organizer_discover_events_screen.dart';
+import '../../organizer/events/create_event_screen.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
 
 /// Main navigation with bottom navbar and modal action button
 class MainNavigation extends StatefulWidget {
@@ -141,11 +142,11 @@ class _MainNavigationState extends State<MainNavigation> {
       ),
       child: BottomAppBar(
         shape: const CircularNotchedRectangle(),
-        notchMargin: 8,
+        notchMargin: AppDimensions.spacingSmall,
         color: AppColors.white,
         elevation: 0,
         child: SizedBox(
-          height: 60,
+          height: AppDimensions.bottomNavHeight,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -191,11 +192,11 @@ class _MainNavigationState extends State<MainNavigation> {
       ),
       child: BottomAppBar(
         shape: const CircularNotchedRectangle(),
-        notchMargin: 8,
+        notchMargin: AppDimensions.spacingSmall,
         color: AppColors.white,
         elevation: 0,
         child: SizedBox(
-          height: 60,
+          height: AppDimensions.bottomNavHeight,
           child: Row(
             mainAxisAlignment: MainAxisAlignment.spaceAround,
             children: [
@@ -243,14 +244,14 @@ class _MainNavigationState extends State<MainNavigation> {
             Icon(
               icon,
               color: isSelected ? AppColors.primary : AppColors.grey,
-              size: 24,
+              size: AppDimensions.iconMedium,
             ),
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacingXSmall),
             Text(
               label,
               style: TextStyle(
                 color: isSelected ? AppColors.primary : AppColors.grey,
-                fontSize: 12,
+                fontSize: AppDimensions.fontSmall,
                 fontWeight: isSelected ? FontWeight.w600 : FontWeight.normal,
               ),
             ),
@@ -270,7 +271,7 @@ class _MainNavigationState extends State<MainNavigation> {
       child: const Icon(
         Icons.add,
         color: AppColors.white,
-        size: 32,
+        size: AppDimensions.iconLarge,
       ),
     );
   }

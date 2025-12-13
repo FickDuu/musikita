@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:musikita/core/constants/app_colors.dart';
+import '../constants/app_dimensions.dart';
 
 //styling for whole app
 class AppTheme {
@@ -33,7 +34,7 @@ class AppTheme {
         elevation: 0,
         centerTitle: true,
         titleTextStyle: GoogleFonts.poppins(
-          fontSize: 20,
+          fontSize: AppDimensions.fontMedium + 5,
           fontWeight: FontWeight.w600,
           color: AppColors.white,
       ),
@@ -98,9 +99,12 @@ class AppTheme {
       style: ElevatedButton.styleFrom(
         backgroundColor: AppColors.primary,
         foregroundColor: AppColors.white,
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.buttonPaddingHorizontal + 8,
+            vertical: AppDimensions.spacingMedium
+        ),
         shape: RoundedRectangleBorder(
-          borderRadius:BorderRadius.circular(12),
+          borderRadius:BorderRadius.circular(AppDimensions.radiusMedium),
         ),
         elevation: 2,
         textStyle: GoogleFonts.poppins(
@@ -114,10 +118,13 @@ class AppTheme {
     outlinedButtonTheme: OutlinedButtonThemeData(
       style: OutlinedButton.styleFrom(
         foregroundColor: AppColors.primary,
-        padding: const EdgeInsets.symmetric(horizontal: 32, vertical: 16),
-        side: const BorderSide(color: AppColors.primary, width: 2),
+        padding: const EdgeInsets.symmetric(
+            horizontal: AppDimensions.buttonPaddingHorizontal + 8,
+            vertical: AppDimensions.spacingMedium
+        ),
+        side: const BorderSide(color: AppColors.primary, width: AppDimensions.borderWidthThick),
         shape: RoundedRectangleBorder(
-          borderRadius: BorderRadius.circular(12),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
         ),
         textStyle: GoogleFonts.poppins(
           fontSize: 16,
@@ -141,31 +148,34 @@ class AppTheme {
     inputDecorationTheme: InputDecorationTheme(
       filled: true,
       fillColor: AppColors.white,
-      contentPadding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+      contentPadding: const EdgeInsets.symmetric(
+          horizontal: AppDimensions.spacingMedium,
+          vertical: AppDimensions.spacingMedium
+      ),
 
       border: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
         borderSide: const BorderSide(color: AppColors.border),
       ),
 
       enabledBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
         borderSide: const BorderSide(color: AppColors.border),
       ),
 
       focusedBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.primary, width: 2),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+        borderSide: const BorderSide(color: AppColors.primary, width: AppDimensions.borderWidthThick),
       ),
 
       errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
         borderSide: const BorderSide(color: AppColors.error),
       ),
 
       focusedErrorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(12),
-        borderSide: const BorderSide(color: AppColors.error, width: 2),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+        borderSide: const BorderSide(color: AppColors.error, width: AppDimensions.borderWidthThick),
       ),
 
       labelStyle: GoogleFonts.poppins(
@@ -188,7 +198,7 @@ class AppTheme {
     cardTheme: CardThemeData(
       elevation: 2,
       shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
       ),
         color: AppColors.surface,
         shadowColor: AppColors.shadow,

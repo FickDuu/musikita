@@ -4,11 +4,12 @@ import 'package:provider/provider.dart';
 import 'package:go_router/go_router.dart';
 import 'package:image_picker/image_picker.dart';
 import '../../../core/constants/app_colors.dart';
-import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../core/utils/validators.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../../data/services/profile_service.dart';
+import '../../../core/constants/app_dimensions.dart';
+import '../../../core/constants/app_limits.dart';
 
 /// Profile editing screen
 class EditProfileScreen extends StatefulWidget {
@@ -50,9 +51,9 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
     try {
       final XFile? image = await _imagePicker.pickImage(
         source: ImageSource.gallery,
-        maxWidth: 1024,
-        maxHeight: 1024,
-        imageQuality: 85,
+        maxWidth: AppLimits.maxProfileImageWidth.toDouble(),
+        maxHeight: AppLimits.maxProfileImageHeight.toDouble(),
+        imageQuality: AppLimits.profileImageQuality,
       );
 
       if (image != null) {
@@ -103,6 +104,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
           const SnackBar(
             content: Text('Profile updated successfully!'),
             backgroundColor: AppColors.success,
+            duration: Duration(seconds: AppLimits.snackbarDurationSeconds),
           ),
         );
         context.pop();
@@ -121,6 +123,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       SnackBar(
         content: Text(message),
         backgroundColor: AppColors.error,
+        duration: Duration(seconds: AppLimits.errorSnackbarDurationSeconds),
       ),
     );
   }
@@ -141,7 +144,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
       body: AppBackground(
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(AppDimensions.spacingLarge),
             child: Form(
               key: _formKey,
               child: Column(
@@ -152,7 +155,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     child: Stack(
                       children: [
                         CircleAvatar(
-                          radius: 60,
+                          radius: AppDimensions.avatarRadiusXLarge,
                           backgroundColor: AppColors.greyLight,
                           backgroundImage: _selectedImage != null
                               ? FileImage(_selectedImage!)
@@ -172,12 +175,12 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                           bottom: 0,
                           right: 0,
                           child: CircleAvatar(
-                            radius: 20,
+                            radius: AppDimensions.iconSmall,
                             backgroundColor: AppColors.primary,
                             child: IconButton(
                               icon: const Icon(
                                 Icons.camera_alt,
-                                size: 20,
+                                size: AppDimensions.iconSmall,
                                 color: AppColors.white,
                               ),
                               onPressed: _pickImage,
@@ -187,7 +190,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       ],
                     ),
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spacingXLarge),
 
                   // Username Field
                   TextFormField(
@@ -199,7 +202,7 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                     validator: Validators.username,
                     textInputAction: TextInputAction.next,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Bio Field
                   TextFormField(
@@ -210,22 +213,22 @@ class _EditProfileScreenState extends State<EditProfileScreen> {
                       hintText: 'Tell people about yourself...',
                     ),
                     maxLines: 4,
-                    maxLength: 200,
+                    maxLength: AppLimits.bioMaxLength,
                     textInputAction: TextInputAction.done,
                   ),
                   const SizedBox(height: 32),
 
                   // Save Button
                   SizedBox(
-                    height: 56,
+                    height: AppDimensions.buttonHeight,
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _saveProfile,
                       child: _isLoading
                           ? const SizedBox(
-                        height: 24,
-                        width: 24,
+                        height: AppDimensions.iconMedium,
+                        width: AppDimensions.iconMedium,
                         child: CircularProgressIndicator(
-                          strokeWidth: 2,
+                          strokeWidth: AppDimensions.progressIndicatorStroke,
                           color: AppColors.white,
                         ),
                       )

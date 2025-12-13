@@ -1,13 +1,14 @@
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import '../../../data/providers/auth_provider.dart' as app_auth;
 import '../../../data/services/messaging_service.dart';
 import '../../../data/models/conversation.dart';
 import '../../musician/messages/chat_screen.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/musician.dart';
+import 'package:musikita/data/providers/auth_provider.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
 
+/// Artist info bottom sheet'
 /// Bottom sheet that displays basic artist information
 /// Shown when tapping on artist name in music cards
 class ArtistInfoBottomSheet extends StatelessWidget {
@@ -46,9 +47,9 @@ class ArtistInfoBottomSheet extends StatelessWidget {
     return Container(
       decoration: const BoxDecoration(
         color: Colors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusXLarge)),
       ),
-      padding: const EdgeInsets.all(24),
+      padding: const EdgeInsets.all(AppDimensions.dialogPadding),
       child: Column(
         mainAxisSize: MainAxisSize.min,
         crossAxisAlignment: CrossAxisAlignment.start,
@@ -56,12 +57,12 @@ class ArtistInfoBottomSheet extends StatelessWidget {
           // Drag handle
           Center(
             child: Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.only(bottom: 20),
+              width: AppDimensions.bottomSheetHandleWidth,
+              height: AppDimensions.bottomSheetHandleHeight,
+              margin: const EdgeInsets.only(bottom: AppDimensions.radiusXLarge),
               decoration: BoxDecoration(
                 color: AppColors.grey.withValues(alpha: 0.3),
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(AppDimensions.spacingXSmall / 2),
               ),
             ),
           ),
@@ -71,7 +72,7 @@ class ArtistInfoBottomSheet extends StatelessWidget {
             children: [
               // Profile picture
               CircleAvatar(
-                radius: 40,
+                radius: AppDimensions.avatarRadiusLarge,
                 backgroundColor: AppColors.primary.withValues(alpha: 0.1),
                 backgroundImage: musician.profileImageUrl != null
                     ? NetworkImage(musician.profileImageUrl!)
@@ -80,14 +81,14 @@ class ArtistInfoBottomSheet extends StatelessWidget {
                     ? Text(
                   _getInitials(musician.artistName ?? 'Unknown'),
                   style: const TextStyle(
-                    fontSize: 24,
+                    fontSize: AppDimensions.fontLarge,
                     fontWeight: FontWeight.bold,
                     color: AppColors.primary,
                   ),
                 )
                     : null,
               ),
-              const SizedBox(width: 16),
+              const SizedBox(width: AppDimensions.spacingMedium),
 
               // Name and basic info
               Expanded(
@@ -107,7 +108,7 @@ class ArtistInfoBottomSheet extends StatelessWidget {
                       overflow: TextOverflow.ellipsis,
                     ),
                     if (musician.experience != null) ...[
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacingXSmall),
                       Text(
                         musician.experience!,
                         style: Theme
@@ -125,33 +126,36 @@ class ArtistInfoBottomSheet extends StatelessWidget {
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacingMedium),
 
           // Genre tags
           if (musician.genres.isNotEmpty) ...[
             Wrap(
-              spacing: 8,
-              runSpacing: 8,
+              spacing: AppDimensions.spacingSmall,
+              runSpacing: AppDimensions.spacingSmall,
               children: musician.genres.map((genre) {
                 return Container(
                   padding:
-                  const EdgeInsets.symmetric(horizontal: 12, vertical: 6),
+                  const EdgeInsets.symmetric(
+                    horizontal: AppDimensions.radiusMedium,
+                    vertical: AppDimensions.spacingSmall - 2
+                  ),
                   decoration: BoxDecoration(
                     color: AppColors.primary.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(16),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
                   ),
                   child: Text(
                     genre,
                     style: const TextStyle(
                       color: AppColors.primary,
-                      fontSize: 12,
+                      fontSize: AppDimensions.fontSmall,
                       fontWeight: FontWeight.w500,
                     ),
                   ),
                 );
               }).toList(),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacingMedium),
           ],
 
           // Bio preview
@@ -165,7 +169,7 @@ class ArtistInfoBottomSheet extends StatelessWidget {
               maxLines: 3,
               overflow: TextOverflow.ellipsis,
             ),
-            const SizedBox(height: 20),
+            const SizedBox(height: AppDimensions.radiusXLarge),
           ],
 
           // Action buttons
@@ -181,22 +185,22 @@ class ArtistInfoBottomSheet extends StatelessWidget {
                   style: ElevatedButton.styleFrom(
                     backgroundColor: AppColors.primary,
                     foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    padding: const EdgeInsets.symmetric(vertical: AppDimensions.buttonPaddingVertical),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                     ),
                   ),
                   child: const Text(
                     'View Full Profile',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      fontSize: 15,
+                      fontSize: AppDimensions.fontMedium,
                     ),
                   ),
                 ),
               ),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.radiusMedium),
 
               // Message button
               Expanded(
@@ -218,7 +222,7 @@ class ArtistInfoBottomSheet extends StatelessWidget {
 
                           final messagingService = MessagingService();
                           final conversationId = await messagingService.getOrCreateConversation(
-                            currentUserId: currentUser.id,
+                            currentUserId: currentUser.uid,
                             otherUserId: musician.userId,
                             currentUserName: currentUser.username,
                             currentUserRole: currentUser.role
@@ -264,17 +268,17 @@ class ArtistInfoBottomSheet extends StatelessWidget {
                       },
                   style: OutlinedButton.styleFrom(
                     foregroundColor: AppColors.primary,
-                    side: const BorderSide(color: AppColors.primary, width: 2),
-                    padding: const EdgeInsets.symmetric(vertical: 14),
+                    side: const BorderSide(color: AppColors.primary, width: AppDimensions.borderWidthThick),
+                    padding: const EdgeInsets.symmetric(vertical: AppDimensions.buttonPaddingVertical),
                     shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(12),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                     ),
                   ),
                   child: const Text(
                     'Message',
                     style: TextStyle(
                       fontWeight: FontWeight.w600,
-                      fontSize: 15,
+                      fontSize: AppDimensions.fontMedium,
                     ),
                   ),
                 ),

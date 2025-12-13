@@ -2,6 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
 import '../../core/constants/app_assets.dart';
 import '../../core/constants/app_colors.dart';
+import '../../core/constants/app_dimensions.dart';
+import '../../core/config/app_config.dart';
 
 /// Splash screen displayed on app launch
 /// Shows the MUSIKITA logo with a fade-in animation
@@ -23,7 +25,7 @@ class _SplashScreenState extends State<SplashScreen>
 
     // Initialize fade animation
     _controller = AnimationController(
-      duration: const Duration(milliseconds: 1500),
+      duration: const Duration(milliseconds: AppConfig.animationDuration),
       vsync: this,
     );
 
@@ -34,7 +36,7 @@ class _SplashScreenState extends State<SplashScreen>
     _controller.forward();
 
     // Navigate to auth gate after 3 seconds
-    Future.delayed(const Duration(seconds: 3), () {
+    Future.delayed(Duration(seconds: AppConfig.splashScreenDuration), () {
       if (mounted) {
         context.go('/auth');
       }
@@ -63,7 +65,7 @@ class _SplashScreenState extends State<SplashScreen>
                 width: MediaQuery.of(context).size.width * 0.7,
                 fit: BoxFit.contain,
               ),
-              const SizedBox(height: 24),
+              const SizedBox(height: AppDimensions.spacingLarge),
               // Loading indicator
               const CircularProgressIndicator(
                 color: AppColors.white,

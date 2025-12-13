@@ -4,6 +4,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../data/models/event.dart';
 import '../../../../data/models/event_application.dart';
 import '../../../../data/services/event_service.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
 
 //display application with status and actions
 class EventApplicationCard extends StatefulWidget {
@@ -77,7 +78,7 @@ class _EventApplicationCardState extends State<EventApplicationCard>{
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Are you sure you want to cancel your application to:'),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingSmall),
             Text(
               widget.event.eventName,
               style: const TextStyle(fontWeight: FontWeight.bold),
@@ -147,19 +148,19 @@ class _EventApplicationCardState extends State<EventApplicationCard>{
   @override
   Widget build(BuildContext context){
     return Container(
-      margin: const EdgeInsets.only(bottom: 12),
+      margin: const EdgeInsets.only(bottom: AppDimensions.radiusMedium),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         border: Border.all(
           color: _borderColor,
-          width: 2,
+          width: AppDimensions.borderWidthThick,
         ),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
             blurRadius: 4,
-            offset:const Offset(0,2),
+            offset:const Offset(0,AppDimensions.cardShadowOffsetY),
           ),
         ],
       ),
@@ -172,14 +173,14 @@ class _EventApplicationCardState extends State<EventApplicationCard>{
             decoration: BoxDecoration(
               color: _borderColor.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.vertical(
-                top: Radius.circular(14),
+                top: Radius.circular(AppDimensions.radiusMedium + 2),
               ),
             ),
 
             child: Row(
               children: [
-                Icon(_statusIcon, color: _borderColor, size: 24),
-                const SizedBox(width: 8),
+                Icon(_statusIcon, color: _borderColor, size: AppDimensions.iconMedium),
+                const SizedBox(width: AppDimensions.spacingSmall),
                 Expanded(
                   child: Column(
                     crossAxisAlignment: CrossAxisAlignment.start,
@@ -221,7 +222,7 @@ class _EventApplicationCardState extends State<EventApplicationCard>{
                           value: 'add_calendar',
                           child: Row(
                             children: [
-                              Icon(Icons.calendar_today, size: 20),
+                              Icon(Icons.calendar_today, size: AppDimensions.iconSmall + 4),
                               SizedBox(width: 8),
                               Text('Add to Calendar'),
                             ],
@@ -246,7 +247,7 @@ class _EventApplicationCardState extends State<EventApplicationCard>{
           ),
 
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.cardPadding),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -255,10 +256,10 @@ class _EventApplicationCardState extends State<EventApplicationCard>{
                   children: [
                     const Icon(
                       Icons.location_city,
-                      size: 18,
+                      size: AppDimensions.iconSmall + 2,
                       color: AppColors.textSecondary,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppDimensions.spacingSmall),
                     Expanded(
                       child: Text(
                         widget.event.venueName,
@@ -269,7 +270,7 @@ class _EventApplicationCardState extends State<EventApplicationCard>{
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
                 // Date and Time
                 Row(
                   children: [
@@ -278,25 +279,25 @@ class _EventApplicationCardState extends State<EventApplicationCard>{
                       size: 18,
                       color: AppColors.textSecondary,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppDimensions.spacingSmall),
                     Text(
                       widget.event.formattedDate,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
-                    const SizedBox(width: 16),
+                    const SizedBox(width: AppDimensions.spacingMedium),
                     const Icon(
                       Icons.access_time,
                       size: 18,
                       color: AppColors.textSecondary,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppDimensions.spacingSmall),
                     Text(
                       widget.event.formattedTimeRange,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Location
                 Row(
@@ -306,7 +307,7 @@ class _EventApplicationCardState extends State<EventApplicationCard>{
                       size: 18,
                       color: AppColors.textSecondary,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppDimensions.spacingSmall),
                     Expanded(
                       child: Text(
                         widget.event.location,
@@ -317,7 +318,7 @@ class _EventApplicationCardState extends State<EventApplicationCard>{
                     ),
                   ],
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Payment
                 Row(
@@ -327,7 +328,7 @@ class _EventApplicationCardState extends State<EventApplicationCard>{
                       size: 18,
                       color: AppColors.textSecondary,
                     ),
-                    const SizedBox(width: 8),
+                    const SizedBox(width: AppDimensions.spacingSmall),
                     Text(
                       widget.event.formattedPayment,
                       style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -339,15 +340,15 @@ class _EventApplicationCardState extends State<EventApplicationCard>{
                 ),
 
                 // Applied date
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.radiusMedium),
                 Container(
                   padding: const EdgeInsets.symmetric(
-                    horizontal: 12,
-                    vertical: 6,
+                    horizontal: AppDimensions.radiusMedium,
+                    vertical: AppDimensions.spacingSmall - 2,
                   ),
                   decoration: BoxDecoration(
                     color: AppColors.greyLight.withValues(alpha: 0.3),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
                   ),
                   child: Text(
                     'Applied ${_formatDate(widget.application.appliedAt)}',

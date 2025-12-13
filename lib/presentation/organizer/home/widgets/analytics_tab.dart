@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_dimensions.dart';
 
 /// Analytics tab for organizers
 class OrganizerAnalyticsTab extends StatelessWidget {
@@ -13,7 +14,7 @@ class OrganizerAnalyticsTab extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SingleChildScrollView(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.spacingMedium),
       child: Column(
         crossAxisAlignment: CrossAxisAlignment.start,
         children: [
@@ -21,7 +22,7 @@ class OrganizerAnalyticsTab extends StatelessWidget {
             'Analytics',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacingMedium),
 
           // Analytics Cards
           _buildAnalyticsCard(
@@ -31,7 +32,7 @@ class OrganizerAnalyticsTab extends StatelessWidget {
             value: '0',
             subtitle: 'Events posted',
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingSmall),
           _buildAnalyticsCard(
             context,
             icon: Icons.people,
@@ -39,7 +40,7 @@ class OrganizerAnalyticsTab extends StatelessWidget {
             value: '0',
             subtitle: 'Musicians applied',
           ),
-          const SizedBox(height: 12),
+          const SizedBox(height: AppDimensions.spacingSmall),
           _buildAnalyticsCard(
             context,
             icon: Icons.check_circle,
@@ -47,14 +48,14 @@ class OrganizerAnalyticsTab extends StatelessWidget {
             value: '0',
             subtitle: 'Musicians booked',
           ),
-          const SizedBox(height: 32),
+          const SizedBox(height: AppDimensions.spacingXLarge),
 
           // Reviews Section (Future)
           Text(
             'Reviews',
             style: Theme.of(context).textTheme.headlineSmall,
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacingMedium),
 
           _buildNoReviewsPlaceholder(context),
 
@@ -72,33 +73,33 @@ class OrganizerAnalyticsTab extends StatelessWidget {
         required String subtitle,
       }) {
     return Container(
-      padding: const EdgeInsets.all(20),
+      padding: const EdgeInsets.all(AppDimensions.spacingMedium + 4),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: AppDimensions.cardShadowBlur,
+            offset: Offset(0, AppDimensions.cardShadowOffsetY),
           ),
         ],
       ),
       child: Row(
         children: [
           Container(
-            padding: const EdgeInsets.all(12),
+            padding: const EdgeInsets.all(AppDimensions.spacingSmall),
             decoration: BoxDecoration(
               color: AppColors.primary.withValues(alpha: 0.1),
-              borderRadius: BorderRadius.circular(12),
+              borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
             ),
             child: Icon(
               icon,
               color: AppColors.primary,
-              size: 28,
+              size: AppDimensions.tabIconSize,
             ),
           ),
-          const SizedBox(width: 16),
+          const SizedBox(width: AppDimensions.spacingMedium),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
@@ -109,7 +110,7 @@ class OrganizerAnalyticsTab extends StatelessWidget {
                     color: AppColors.textSecondary,
                   ),
                 ),
-                const SizedBox(height: 4),
+                const SizedBox(height: AppDimensions.spacingXSmall),
                 Text(
                   value,
                   style: Theme.of(context).textTheme.headlineMedium?.copyWith(
@@ -130,15 +131,15 @@ class OrganizerAnalyticsTab extends StatelessWidget {
 
   Widget _buildNoReviewsPlaceholder(BuildContext context) {
     return Container(
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: AppDimensions.cardShadowBlur,
+            offset: Offset(0, AppDimensions.cardShadowOffsetY),
           ),
         ],
       ),
@@ -149,14 +150,14 @@ class OrganizerAnalyticsTab extends StatelessWidget {
             size: 64,
             color: AppColors.grey.withValues(alpha: 0.5),
           ),
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacingMedium),
           Text(
             'No reviews yet',
             style: Theme.of(context).textTheme.titleMedium?.copyWith(
               color: AppColors.textSecondary,
             ),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: AppDimensions.spacingSmall),
           Text(
             'Reviews from musicians will appear here',
             style: Theme.of(context).textTheme.bodySmall,

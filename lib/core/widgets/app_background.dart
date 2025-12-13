@@ -12,7 +12,7 @@ class AppBackground extends StatelessWidget{
     super.key,
     required this.child,
     this.backgroundColor,
-    this.patternOpacity = 0.05,
+    this.patternOpacity = 0.1,
   });
 
   @override

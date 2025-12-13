@@ -1,15 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import '/../../core/constants/app_colors.dart';
-import '/../../core/theme/app_theme.dart';
 import '/../../core/widgets/app_background.dart';
 import '/../../data/providers/auth_provider.dart';
 import '/../../data/services/profile_service.dart';
-import '../widgets/collapsible_profile_header.dart';
-import '../widgets/middle_navbar.dart';
-import '../widgets/music_tab.dart';
-import '../widgets/calendar_tab.dart';
-import '../widgets/analytics_tab.dart';
+import 'widgets/collapsible_profile_header.dart';
+import '../home/widgets/music_tab.dart';
+import '../home/widgets/calendar_tab.dart';
+import '../home/widgets/analytics_tab.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
+
 
 /// Musician home/profile screen
 /// Shows profile header, middle navbar with tabs, and content
@@ -33,7 +33,7 @@ class _MusicianHomeScreenState extends State<MusicianHomeScreen>
 
   // Header collapse tracking
   bool _isHeaderCollapsed = false;
-  static const double _collapseThreshold = 200.0;
+  static const double _collapseThreshold = AppDimensions.headerCollapseThreshold;
   String? _bio;
 
   @override
@@ -80,7 +80,7 @@ class _MusicianHomeScreenState extends State<MusicianHomeScreen>
             return [
               // Collapsible Profile Header
               SliverAppBar(
-                expandedHeight: 300,
+                expandedHeight: AppDimensions.headerExpandedHeight,
                 floating: false,
                 pinned: true,
                 backgroundColor: AppColors.primary,
@@ -114,9 +114,9 @@ class _MusicianHomeScreenState extends State<MusicianHomeScreen>
                     labelColor: AppColors.primary,
                     unselectedLabelColor: AppColors.grey,
                     tabs: const [
-                      Tab(icon: Icon(Icons.music_note, size: 28)),
-                      Tab(icon: Icon(Icons.calendar_today, size: 28)),
-                      Tab(icon: Icon(Icons.analytics, size: 28)),
+                      Tab(icon: Icon(Icons.music_note, size: AppDimensions.tabIconSize)),
+                      Tab(icon: Icon(Icons.calendar_today, size: AppDimensions.tabIconSize)),
+                      Tab(icon: Icon(Icons.analytics, size: AppDimensions.tabIconSize)),
                     ],
                   ),
                 ),
@@ -162,7 +162,7 @@ class _SliverAppBarDelegate extends SliverPersistentHeaderDelegate {
           BoxShadow(
             color: AppColors.shadow,
             blurRadius: 4,
-            offset: const Offset(0, 2),
+            offset: const Offset(0, AppDimensions.cardShadowOffsetY),
           ),
         ],
       ),

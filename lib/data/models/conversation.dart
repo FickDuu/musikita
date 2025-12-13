@@ -1,5 +1,4 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:flutter/services.dart';
 
 class Conversation {
   final String id;
@@ -24,7 +23,7 @@ class Conversation {
     required this.updatedAt,
   });
 
-  //get other user's detials
+  //get other user's details
   ParticipantDetail getOtherParticipant(String currentUserId){
     final otherUserId = participants.firstWhere((id) => id != currentUserId);
     return participantDetails[otherUserId]!;

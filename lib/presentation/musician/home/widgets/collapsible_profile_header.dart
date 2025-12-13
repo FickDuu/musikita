@@ -4,6 +4,7 @@ import 'package:go_router/go_router.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../data/providers/auth_provider.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
 
 /// Collapsible profile header with image, username, and bio
 /// Similar to Spotify artist page header
@@ -48,9 +49,9 @@ class CollapsibleProfileHeader extends StatelessWidget {
 
         // Username and Bio Overlay
         Positioned(
-          left: 24,
-          right: 24,
-          bottom: 24,
+          left: AppDimensions.spacingLarge,
+          right: AppDimensions.spacingLarge,
+          bottom: AppDimensions.spacingLarge,
           child: AnimatedOpacity(
             opacity: isCollapsed ? 0.0 : 1.0,
             duration: const Duration(milliseconds: 200),
@@ -79,14 +80,14 @@ class CollapsibleProfileHeader extends StatelessWidget {
                     overflow: TextOverflow.ellipsis,
                   ),
                 if(!isCollapsed)
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Bio
                 if(!isCollapsed)
                   Text(
                     bio,
                     style: const TextStyle(
-                      fontSize: 14,
+                      fontSize: AppDimensions.fontBody,
                       color: AppColors.white,
                       height: 1.4,
                       shadows: [
@@ -107,8 +108,8 @@ class CollapsibleProfileHeader extends StatelessWidget {
 
         // Edit Profile & Logout Buttons (top right)
         Positioned(
-          top: 48,
-          right: 16,
+          top: AppDimensions.spacingXXLarge,
+          right: AppDimensions.spacingMedium,
           child: Row(
             children: [
               // Logout button

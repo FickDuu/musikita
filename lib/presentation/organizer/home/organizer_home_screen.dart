@@ -10,6 +10,8 @@ import '../../../data/services/profile_service.dart';
 import 'widgets/events_tab.dart';
 import 'widgets/analytics_tab.dart';
 import 'widgets/applications_tab.dart';
+import '../../../core/constants/app_dimensions.dart';
+import '../../../core/constants/app_limits.dart';
 
 /// Organizer home screen with create event FAB
 class OrganizerHomeScreen extends StatefulWidget {
@@ -31,7 +33,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
   final _profileService = ProfileService();
 
   bool _isHeaderCollapsed = false;
-  static const double _collapseThreshold = 200.0;
+  static const double _collapseThreshold = AppDimensions.headerCollapseThreshold;
   String? _bio;
 
   @override
@@ -78,7 +80,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
             return [
               // Collapsible Profile Header
               SliverAppBar(
-                expandedHeight: 300,
+                expandedHeight: AppDimensions.headerExpandedHeight,
                 floating: false,
                 pinned: true,
                 backgroundColor: AppColors.primary,
@@ -99,9 +101,9 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
                     labelColor: AppColors.primary,
                     unselectedLabelColor: AppColors.grey,
                     tabs: const [
-                      Tab(icon: Icon(Icons.event, size: 28)),
-                      Tab(icon: Icon(Icons.people, size: 28)),
-                      Tab(icon: Icon(Icons.analytics, size: 28)),
+                      Tab(icon: Icon(Icons.event, size: AppDimensions.tabIconSize)),
+                      Tab(icon: Icon(Icons.people, size: AppDimensions.tabIconSize)),
+                      Tab(icon: Icon(Icons.analytics, size: AppDimensions.tabIconSize)),
                     ],
                   ),
                 ),
@@ -145,9 +147,9 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
 
         // Username and Bio Overlay
         Positioned(
-          left: 24,
-          right: 24,
-          bottom: 24,
+          left: AppDimensions.spacingLarge,
+          right: AppDimensions.spacingLarge,
+          bottom: AppDimensions.spacingLarge,
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
@@ -171,7 +173,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
                 maxLines: 2,
                 overflow: TextOverflow.ellipsis,
               ),
-              const SizedBox(height: 8),
+              const SizedBox(height: AppDimensions.spacingSmall),
 
               // Bio
               Text(
@@ -188,7 +190,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
                     ),
                   ],
                 ),
-                maxLines: 3,
+                maxLines: AppLimits.bioPreviewMaxLines,
                 overflow: TextOverflow.ellipsis,
               ),
             ],
@@ -198,7 +200,7 @@ class _OrganizerHomeScreenState extends State<OrganizerHomeScreen>
         // Edit Profile & Logout Buttons (top right)
         Positioned(
           top: 48,
-          right: 16,
+          right: AppDimensions.spacingMedium,
           child: Row(
             children: [
               // Logout button

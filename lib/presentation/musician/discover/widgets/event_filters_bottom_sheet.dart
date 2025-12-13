@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import '../../../../core/constants/app_colors.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
 
 /// Bottom sheet for filtering events by date and distance
 class EventFiltersBottomSheet extends StatefulWidget {
@@ -83,12 +84,12 @@ class _EventFiltersBottomSheetState extends State<EventFiltersBottomSheet> {
     return Container(
       decoration: const BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusXLarge)),
       ),
       child: SafeArea(
         child: SingleChildScrollView(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(AppDimensions.dialogPadding),
             child: Column(
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -96,15 +97,15 @@ class _EventFiltersBottomSheetState extends State<EventFiltersBottomSheet> {
                 // Handle bar
                 Center(
                   child: Container(
-                    width: 40,
-                    height: 4,
+                    width: AppDimensions.bottomSheetHandleWidth,
+                    height: AppDimensions.bottomSheetHandleHeight,
                     decoration: BoxDecoration(
                       color: AppColors.greyLight,
-                      borderRadius: BorderRadius.circular(2),
+                      borderRadius: BorderRadius.circular(AppDimensions.spacingXSmall / 2),
                     ),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacingMedium),
 
                 // Title
                 Row(
@@ -124,14 +125,14 @@ class _EventFiltersBottomSheetState extends State<EventFiltersBottomSheet> {
                     ),
                   ],
                 ),
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingLarge),
 
                 // Date Range Section
                 Text(
                   'Date Range',
                   style: Theme.of(context).textTheme.titleMedium,
                 ),
-                const SizedBox(height: 12),
+                const SizedBox(height: AppDimensions.radiusMedium),
 
                 // Date range button
                 OutlinedButton.icon(
@@ -152,14 +153,14 @@ class _EventFiltersBottomSheetState extends State<EventFiltersBottomSheet> {
                           : AppColors.border,
                     ),
                     padding: const EdgeInsets.symmetric(
-                      horizontal: 16,
-                      vertical: 16,
+                      horizontal: AppDimensions.spacingMedium,
+                      vertical: AppDimensions.spacingMedium,
                     ),
                   ),
                 ),
 
                 if (_startDate != null && _endDate != null) ...[
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Row(
                     mainAxisAlignment: MainAxisAlignment.center,
                     children: [
@@ -170,7 +171,7 @@ class _EventFiltersBottomSheetState extends State<EventFiltersBottomSheet> {
                             _endDate = null;
                           });
                         },
-                        icon: const Icon(Icons.close, size: 16),
+                        icon: const Icon(Icons.close, size: AppDimensions.iconSmall),
                         label: const Text('Clear dates'),
                         style: TextButton.styleFrom(
                           foregroundColor: AppColors.error,
@@ -180,7 +181,7 @@ class _EventFiltersBottomSheetState extends State<EventFiltersBottomSheet> {
                   ),
                 ],
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingLarge),
 
                 // Distance Section
                 Text(
@@ -249,7 +250,7 @@ class _EventFiltersBottomSheetState extends State<EventFiltersBottomSheet> {
                         onPressed: () {
                           setState(() => _maxDistance = null);
                         },
-                        icon: const Icon(Icons.close, size: 16),
+                        icon: const Icon(Icons.close, size: AppDimensions.spacingMedium),
                         label: const Text('Clear distance'),
                         style: TextButton.styleFrom(
                           foregroundColor: AppColors.error,
@@ -259,23 +260,23 @@ class _EventFiltersBottomSheetState extends State<EventFiltersBottomSheet> {
                   ),
                 ],
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingLarge),
 
                 // Info text
                 Container(
-                  padding: const EdgeInsets.all(12),
+                  padding: const EdgeInsets.all(AppDimensions.radiusMedium),
                   decoration: BoxDecoration(
                     color: AppColors.info.withValues(alpha: 0.1),
-                    borderRadius: BorderRadius.circular(8),
+                    borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
                   ),
                   child: Row(
                     children: [
                       const Icon(
                         Icons.info_outline,
-                        size: 20,
+                        size: AppDimensions.iconSmall + 4,
                         color: AppColors.info,
                       ),
-                      const SizedBox(width: 8),
+                      const SizedBox(width: AppDimensions.spacingSmall),
                       Expanded(
                         child: Text(
                           'Distance is calculated from your current location',
@@ -289,17 +290,17 @@ class _EventFiltersBottomSheetState extends State<EventFiltersBottomSheet> {
                   ),
                 ),
 
-                const SizedBox(height: 24),
+                const SizedBox(height: AppDimensions.spacingLarge),
 
                 // Apply button
                 SizedBox(
-                  height: 56,
+                  height: AppDimensions.buttonHeightLarge,
                   child: ElevatedButton(
                     onPressed: _applyFilters,
                     child: const Text(
                       'Apply Filters',
                       style: TextStyle(
-                        fontSize: 16,
+                        fontSize: AppDimensions.fontMedium + 1,
                         fontWeight: FontWeight.bold,
                       ),
                     ),

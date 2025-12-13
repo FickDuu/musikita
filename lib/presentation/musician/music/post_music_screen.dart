@@ -7,6 +7,9 @@ import '../../../core/widgets/app_background.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../../data/services/music_service.dart';
 import '../../../data/models/music_post.dart';
+import '../../../core/constants/app_dimensions.dart';
+import '../../../core/constants/app_limits.dart';
+import '../../../core/config/app_config.dart';
 
 /// Post music screen - for uploading new music
 class PostMusicScreen extends StatefulWidget {
@@ -52,8 +55,8 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
         final fileSize = await file.length();
 
         // Check file size (10MB limit)
-        if (fileSize > 10 * 1024 * 1024) {
-          _showError('File size exceeds 10MB limit');
+        if (fileSize > AppLimits.maxAudioSizeBytes) {
+          _showError('File size exceeds ${AppLimits.maxAudioSizeBytes ~/ (1024 * 1024)}10MB limit');
           return;
         }
 
@@ -110,6 +113,7 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
           const SnackBar(
             content: Text('Music uploaded successfully!'),
             backgroundColor: AppColors.success,
+            duration: Duration(seconds: AppLimits.successSnackbarDurationSeconds),
           ),
         );
 
@@ -135,6 +139,7 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
       SnackBar(
         content: Text(message),
         backgroundColor: AppColors.error,
+        duration: Duration(seconds: AppLimits.errorSnackbarDurationSeconds),
       ),
     );
   }
@@ -153,7 +158,7 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
       body: AppBackground(
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(AppDimensions.spacingLarge),
             child: Form(
               key: _formKey,
               child: Column(
@@ -168,21 +173,21 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spacingXLarge),
 
                   // Audio File Picker
                   GestureDetector(
                     onTap: _isUploading ? null : _pickAudioFile,
                     child: Container(
-                      padding: const EdgeInsets.all(32),
+                      padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
                       decoration: BoxDecoration(
                         color: AppColors.white,
-                        borderRadius: BorderRadius.circular(16),
+                        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
                         border: Border.all(
                           color: _selectedAudioFile != null
                               ? AppColors.primary
                               : AppColors.border,
-                          width: 2,
+                          width: AppDimensions.borderWidthThick,
                         ),
                       ),
                       child: Column(
@@ -196,7 +201,7 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
                                 ? AppColors.primary
                                 : AppColors.grey,
                           ),
-                          const SizedBox(height: 16),
+                          const SizedBox(height: AppDimensions.spacingMedium),
                           Text(
                             _selectedAudioFile != null
                                 ? _selectedAudioFile!.path.split('/').last
@@ -205,7 +210,7 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
                             textAlign: TextAlign.center,
                           ),
                           if (_selectedAudioFile != null) ...[
-                            const SizedBox(height: 8),
+                            const SizedBox(height: AppDimensions.spacingSmall),
                             Text(
                               'Max 10MB',
                               style: Theme.of(context).textTheme.bodySmall,
@@ -215,7 +220,7 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingLarge),
 
                   // Song Title
                   TextFormField(
@@ -232,7 +237,7 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
                     },
                     textInputAction: TextInputAction.next,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Genre Dropdown
                   DropdownButtonFormField<String>(
@@ -241,7 +246,7 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
                       labelText: 'Genre (Optional)',
                       prefixIcon: Icon(Icons.category),
                     ),
-                    items: MusicGenres.genres.map((genre) {
+                    items: AppConfig.supportedGenres.map((genre) {
                       return DropdownMenuItem(
                         value: genre,
                         child: Text(genre),
@@ -251,7 +256,7 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
                       setState(() => _selectedGenre = value);
                     },
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spacingXLarge),
 
                   // Upload Progress
                   if (_isUploading) ...[
@@ -262,26 +267,26 @@ class _PostMusicScreenState extends State<PostMusicScreen> {
                         AppColors.primary,
                       ),
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppDimensions.spacingMedium),
                     Text(
                       'Uploading... ${(_uploadProgress * 100).toInt()}%',
                       textAlign: TextAlign.center,
                       style: Theme.of(context).textTheme.bodyMedium,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppDimensions.spacingMedium),
                   ],
 
                   // Upload Button
                   SizedBox(
-                    height: 56,
+                    height: AppDimensions.buttonHeight,
                     child: ElevatedButton(
                       onPressed: _isUploading ? null : _uploadMusic,
                       child: _isUploading
                           ? const SizedBox(
-                        height: 24,
-                        width: 24,
+                        height: AppDimensions.iconMedium,
+                        width: AppDimensions.iconMedium,
                         child: CircularProgressIndicator(
-                          strokeWidth: 2,
+                          strokeWidth: AppDimensions.progressIndicatorStroke,
                           color: AppColors.white,
                         ),
                       )

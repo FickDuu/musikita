@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/event.dart';
 import '../models/event_application.dart';
+import 'package:musikita/core/config/app_config.dart';
 
 class EventService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -8,7 +9,7 @@ class EventService {
   //get all available event
   Stream <List<Event>> getAvailableEvents() {
     return _firestore
-        .collection('events')
+        .collection(AppConfig.eventsCollection)
         .where('status', isEqualTo: 'open')
         .where(
         'eventDate', isGreaterThanOrEqualTo: Timestamp.fromDate(DateTime.now()))
@@ -25,7 +26,7 @@ class EventService {
   Stream<List<Event>> getEventsByDateRange(DateTime startDate,
       DateTime endDate) {
     return _firestore
-        .collection('events')
+        .collection(AppConfig.eventsCollection)
         .where('status', isEqualTo: 'open')
         .where(
         'eventDate', isGreaterThanOrEqualTo: Timestamp.fromDate(startDate))
@@ -42,7 +43,7 @@ class EventService {
   //get single event by ID
   Future<Event?> getEventById(String eventId) async {
     try {
-      final doc = await _firestore.collection('events').doc(eventId).get();
+      final doc = await _firestore.collection(AppConfig.eventsCollection).doc(eventId).get();
       if (!doc.exists) return null;
       return Event.fromJson(doc.data()!);
     } catch (e) {
@@ -53,7 +54,7 @@ class EventService {
   //create event
   Future<Event> createEvent(Event event) async {
     try {
-      final docRef = _firestore.collection('events').doc();
+      final docRef = _firestore.collection(AppConfig.eventsCollection).doc();
       final newEvent = event.copyWith(id: docRef.id);
       await docRef.set(newEvent.toJson());
       return newEvent;
@@ -96,7 +97,7 @@ class EventService {
       }
 
       //create application
-      final docRef = _firestore.collection('event_applications').doc();
+      final docRef = _firestore.collection(AppConfig.eventApplicationsCollection).doc();
       final application = EventApplication(
         id: docRef.id,
         eventId: eventId,
@@ -119,7 +120,7 @@ class EventService {
   Future<bool> hasAppliedToEvent(String musicianId, String eventId) async {
     try {
       final snapshot = await _firestore
-          .collection('event_applications')
+          .collection(AppConfig.eventApplicationsCollection)
           .where('musicianId', isEqualTo: musicianId)
           .where('eventId', isEqualTo: eventId)
           .where('status', whereIn: ['pending', 'accepted'])
@@ -143,7 +144,7 @@ class EventService {
     try{
       //get accepted applications for the musician
       final applications = await _firestore
-          .collection('event_applications')
+          .collection(AppConfig.eventApplicationsCollection)
           .where('musicianId', isEqualTo: musicianId)
           .where('status', isEqualTo: 'accepted')
           .get();
@@ -209,7 +210,7 @@ class EventService {
   //get musician applications
   Stream<List<EventApplication>> getMusicianApplications(String musicianId){
     return _firestore
-        .collection('event_applications')
+        .collection(AppConfig.eventApplicationsCollection)
         .where('musicianId', isEqualTo: musicianId)
         .orderBy('appliedAt', descending: true)
         .snapshots()
@@ -221,7 +222,7 @@ class EventService {
   //get pending application
   Stream<List<EventApplication>> getPendingApplications(String musicianId){
     return _firestore
-        .collection('event_applications')
+        .collection(AppConfig.eventApplicationsCollection)
         .where('musicianId', isEqualTo: musicianId)
         .where('status', isEqualTo: 'pending')
         .orderBy('appliedAt', descending: true)
@@ -234,7 +235,7 @@ class EventService {
   //get accepted applications
   Stream<List<EventApplication>> getAcceptedApplications(String musicianId){
     return _firestore
-        .collection('event_applications')
+        .collection(AppConfig.eventApplicationsCollection)
         .where('musicianId', isEqualTo: musicianId)
         .where('status', isEqualTo: 'accepted')
         .orderBy('appliedAt', descending: true)
@@ -247,7 +248,7 @@ class EventService {
   //cancel application
   Future<void> cancelApplication(String applicationId) async{
     try {
-      await _firestore.collection('event_applications').doc(applicationId).delete();
+      await _firestore.collection(AppConfig.eventApplicationsCollection).doc(applicationId).delete();
     } catch (e) {
       throw Exception('Failed to cancel application: $e');
     }
@@ -269,20 +270,20 @@ class EventService {
         updates['rejectionReason'] = rejectionReason;
       }
       await _firestore
-          .collection('event_applications')
+          .collection(AppConfig.eventApplicationsCollection)
           .doc(applicationId)
           .update(updates);
 
       // If accepted, decrease available slots
       if (status == 'accepted') {
         final app = await _firestore
-            .collection('event_applications')
+            .collection(AppConfig.eventApplicationsCollection)
             .doc(applicationId)
             .get();
 
         if (app.exists) {
           final eventId = app.data()!['eventId'] as String;
-          await _firestore.collection('events').doc(eventId).update({
+          await _firestore.collection(AppConfig.eventsCollection).doc(eventId).update({
             'slotsAvailable': FieldValue.increment(-1),
           });
         }
@@ -302,7 +303,7 @@ class EventService {
         double? userLongitude,
       }) async{
     try{
-      Query query = _firestore.collection('events').where('status', isEqualTo: 'open');
+      Query query = _firestore.collection(AppConfig.eventsCollection).where('status', isEqualTo: 'open');
       if(startDate != null){
         query = query.where('eventDate', isGreaterThanOrEqualTo: startDate);
       }
@@ -316,7 +317,7 @@ class EventService {
           .toList();
 
       final applicationsSnapshot = await _firestore
-          .collection('event_applications')
+          .collection(AppConfig.eventApplicationsCollection)
           .where('musicianId', isEqualTo: musicianId)
           .where('status', whereIn: ['pending', 'accepted'])
           .get();
@@ -329,7 +330,7 @@ class EventService {
 
       // Check for time clashes with accepted events
       final acceptedEventsSnapshot = await _firestore
-          .collection('event_applications')
+          .collection(AppConfig.eventApplicationsCollection)
           .where('musicianId', isEqualTo: musicianId)
           .where('status', isEqualTo: 'accepted')
           .get();
@@ -381,7 +382,7 @@ class EventService {
         DateTime? endDate,
       }){
     return _firestore
-        .collection('event_applications')
+        .collection(AppConfig.eventApplicationsCollection)
         .where('musicianId', isEqualTo: musicianId)
         .where('status', whereIn: ['pending', 'accepted'])
         .snapshots()
@@ -390,7 +391,7 @@ class EventService {
           .map((doc) => doc.data()['eventId'] as String)
           .toSet();
 
-      Query query = _firestore.collection('events').where('status', isEqualTo: 'open');
+      Query query = _firestore.collection(AppConfig.eventsCollection).where('status', isEqualTo: 'open');
 
       if(startDate != null){
         query = query.where('eventDate', isGreaterThanOrEqualTo: startDate);
@@ -407,7 +408,7 @@ class EventService {
 
       var filteredEvents = events.where((event) => !appliedEventIds.contains(event.id)).toList();
 
-      final acceptedSnapshot = await _firestore.collection('event_applications')
+      final acceptedSnapshot = await _firestore.collection(AppConfig.eventApplicationsCollection)
           .where('musicianId', isEqualTo: musicianId).where('status', isEqualTo: 'accepted').get();
 
       final acceptedEventIds = acceptedSnapshot.docs.map((doc) => doc.data()['eventId'] as String).toList();
@@ -433,7 +434,7 @@ class EventService {
   /// Get all events created by organizer
   Stream<List<Event>> getOrganizerEvents(String organizerId) {
     return _firestore
-        .collection('events')
+        .collection(AppConfig.eventsCollection)
         .where('organizerId', isEqualTo: organizerId)
         .orderBy('eventDate', descending: false)
         .snapshots()
@@ -445,7 +446,7 @@ class EventService {
   /// Update an existing event
   Future<void> updateEvent(Event event) async {
     try {
-      await _firestore.collection('events').doc(event.id).update(event.toJson());
+      await _firestore.collection(AppConfig.eventsCollection).doc(event.id).update(event.toJson());
     } catch (e) {
       throw Exception('Failed to update event: $e');
     }
@@ -456,7 +457,7 @@ class EventService {
     try {
       // Delete all applications for this event
       final applications = await _firestore
-          .collection('event_applications')
+          .collection(AppConfig.eventApplicationsCollection)
           .where('eventId', isEqualTo: eventId)
           .get();
 
@@ -465,7 +466,7 @@ class EventService {
       }
 
       // Delete the event
-      await _firestore.collection('events').doc(eventId).delete();
+      await _firestore.collection(AppConfig.eventsCollection).doc(eventId).delete();
     } catch (e) {
       throw Exception('Failed to delete event: $e');
     }
@@ -474,7 +475,7 @@ class EventService {
   /// Get all applications for a specific event
   Stream<List<EventApplication>> getEventApplications(String eventId) {
     return _firestore
-        .collection('event_applications')
+        .collection(AppConfig.eventApplicationsCollection)
         .where('eventId', isEqualTo: eventId)
         .orderBy('appliedAt', descending: true)
         .snapshots()
@@ -486,7 +487,7 @@ class EventService {
   /// Get all applications for all organizer's events
   Stream<List<EventApplication>> getOrganizerApplications(String organizerId) {
     return _firestore
-        .collection('event_applications')
+        .collection(AppConfig.eventApplicationsCollection)
         .where('organizerId', isEqualTo: organizerId)
         .orderBy('appliedAt', descending: true)
         .snapshots()
@@ -498,7 +499,7 @@ class EventService {
   /// Get pending applications for organizer
   Stream<List<EventApplication>> getOrganizerPendingApplications(String organizerId) {
     return _firestore
-        .collection('event_applications')
+        .collection(AppConfig.eventApplicationsCollection)
         .where('organizerId', isEqualTo: organizerId)
         .where('status', isEqualTo: 'pending')
         .orderBy('appliedAt', descending: true)
@@ -535,7 +536,7 @@ class EventService {
 
   Stream<List<EventApplication>> getOrganizerApplicationsStream(String organizerId) {
     return _firestore
-        .collection('event_applications')
+        .collection(AppConfig.eventApplicationsCollection)
         .where('organizerId', isEqualTo: organizerId)
         .orderBy('appliedAt', descending: true)
         .snapshots()

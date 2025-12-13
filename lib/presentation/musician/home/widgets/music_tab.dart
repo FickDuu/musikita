@@ -3,6 +3,7 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../data/services/music_service.dart';
 import '../../../../data/models/music_post.dart';
 import 'music_player_card.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
 
 /// Music tab - displays user's uploaded music with player controls
 class MusicTab extends StatelessWidget {
@@ -33,7 +34,7 @@ class MusicTab extends StatelessWidget {
         if (snapshot.hasError) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -42,14 +43,14 @@ class MusicTab extends StatelessWidget {
                     size: 64,
                     color: AppColors.error.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   Text(
                     'Error loading music',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: AppColors.error,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     'Please try again later',
                     style: Theme.of(context).textTheme.bodySmall,
@@ -66,7 +67,7 @@ class MusicTab extends StatelessWidget {
         if (musicPosts.isEmpty) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -75,12 +76,12 @@ class MusicTab extends StatelessWidget {
                     size: 80,
                     color: AppColors.grey.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingLarge),
                   Text(
                     'No music yet',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     'Upload your first track using the + button',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -96,12 +97,12 @@ class MusicTab extends StatelessWidget {
 
         // Music list
         return ListView.builder(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppDimensions.spacingMedium),
           itemCount: musicPosts.length,
           itemBuilder: (context, index) {
             final musicPost = musicPosts[index];
             return Padding(
-              padding: const EdgeInsets.only(bottom: 12),
+              padding: const EdgeInsets.only(bottom: AppDimensions.radiusMedium),
               child: MusicPlayerCard(
                 musicPost: musicPost,
                 onDelete: () => _showDeleteDialog(context, musicPost),
@@ -197,7 +198,7 @@ class MusicTab extends StatelessWidget {
                     prefixIcon: Icon(Icons.music_note),
                   ),
                 ),
-                const SizedBox(height: 16),
+                const SizedBox(height: AppDimensions.spacingMedium),
 
                 // Genre dropdown
                 DropdownButtonFormField<String>(

@@ -4,6 +4,9 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../data/models/music_post.dart';
 import '../../musician/home/widgets/music_player_card.dart';
+import '../../../core/constants/app_dimensions.dart';
+import '../../../core/constants/app_limits.dart';
+import '../../../core/config/app_config.dart';
 
 /// Organizer's view of Discover Music - Browse musicians' music
 /// Same as musician's discover music, but for organizers
@@ -38,7 +41,7 @@ class _OrganizerDiscoverMusicScreenState extends State<OrganizerDiscoverMusicScr
   Widget _buildMusicFeed() {
     return StreamBuilder<QuerySnapshot>(
       stream: _firestore
-          .collection('music_posts')
+          .collection(AppConfig.musicPostsCollection)
           .orderBy('uploadedAt', descending: true)
           .snapshots(),
       builder: (context, snapshot) {
@@ -55,7 +58,7 @@ class _OrganizerDiscoverMusicScreenState extends State<OrganizerDiscoverMusicScr
         if (snapshot.hasError) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -64,19 +67,19 @@ class _OrganizerDiscoverMusicScreenState extends State<OrganizerDiscoverMusicScr
                     size: 64,
                     color: AppColors.error.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   Text(
                     'Error loading music',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: AppColors.error,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     'Please try again later',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   ElevatedButton.icon(
                     onPressed: () => setState(() {}),
                     icon: const Icon(Icons.refresh),
@@ -97,7 +100,7 @@ class _OrganizerDiscoverMusicScreenState extends State<OrganizerDiscoverMusicScr
               'id': doc.id,
             });
           } catch (e) {
-            print('Error parsing music post ${doc.id}: $e');
+            debugPrint('Error parsing music post ${doc.id}: $e');
             return null;
           }
         }).whereType<MusicPost>().toList();
@@ -106,7 +109,7 @@ class _OrganizerDiscoverMusicScreenState extends State<OrganizerDiscoverMusicScr
         if (musicPosts.isEmpty) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -115,12 +118,12 @@ class _OrganizerDiscoverMusicScreenState extends State<OrganizerDiscoverMusicScr
                     size: 80,
                     color: AppColors.grey.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingLarge),
                   Text(
                     'No Music Yet',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     'Musicians\' music will appear here when they upload.',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -138,16 +141,16 @@ class _OrganizerDiscoverMusicScreenState extends State<OrganizerDiscoverMusicScr
         return RefreshIndicator(
           onRefresh: () async {
             setState(() {});
-            await Future.delayed(const Duration(milliseconds: 500));
+            await Future.delayed(const Duration(milliseconds: AppLimits.refreshThrottleDuration));
           },
           color: AppColors.primary,
           child: ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             itemCount: musicPosts.length,
             itemBuilder: (context, index) {
               final post = musicPosts[index];
               return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.only(bottom: AppDimensions.spacingMedium),
                 child: MusicPlayerCard(
                   musicPost: post,
                   showArtistName: true, // Show artist name for organizers

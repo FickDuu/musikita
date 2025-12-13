@@ -1,6 +1,8 @@
 import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
+import 'package:musikita/core/config/app_config.dart';
+import 'package:musikita/core/constants/app_limits.dart';
 
 /// Service for managing user profiles
 class ProfileService {
@@ -13,7 +15,7 @@ class ProfileService {
     required File imageFile,
   }) async {
     try {
-      final ref = _storage.ref().child('users/$userId/profile_image.jpg');
+      final ref = _storage.ref().child('${AppConfig.profileImagesPath}/$userId/profile_image.jpg');
       final uploadTask = await ref.putFile(imageFile);
       final downloadUrl = await uploadTask.ref.getDownloadURL();
       return downloadUrl;
@@ -41,20 +43,20 @@ class ProfileService {
       }
 
       // Update users collection
-      await _firestore.collection('users').doc(userId).update(updates);
+      await _firestore.collection(AppConfig.usersCollection).doc(userId).update(updates);
 
       // Also update role-specific collection with bio if provided
       if (bio != null && bio.isNotEmpty) {
         // Check if user is musician or organizer
-        final userDoc = await _firestore.collection('users').doc(userId).get();
+        final userDoc = await _firestore.collection(AppConfig.usersCollection).doc(userId).get();
         final role = userDoc.data()?['role'] as String?;
 
         if (role == 'musician') {
-          await _firestore.collection('musicians').doc(userId).set({
+          await _firestore.collection(AppConfig.musiciansCollection).doc(userId).set({
             'bio': bio,
           }, SetOptions(merge: true));
         } else if (role == 'organizer') {
-          await _firestore.collection('organizers').doc(userId).set({
+          await _firestore.collection(AppConfig.organizersCollection).doc(userId).set({
             'bio': bio,
           }, SetOptions(merge: true));
         }
@@ -67,7 +69,7 @@ class ProfileService {
   /// Get musician bio
   Future<String?> getMusicianBio(String userId) async {
     try {
-      final doc = await _firestore.collection('musicians').doc(userId).get();
+      final doc = await _firestore.collection(AppConfig.musiciansCollection).doc(userId).get();
       return doc.data()?['bio'] as String?;
     } catch (e) {
       return null;
@@ -77,7 +79,7 @@ class ProfileService {
   /// Get organizer bio
   Future<String?> getOrganizerBio(String userId) async {
     try {
-      final doc = await _firestore.collection('organizers').doc(userId).get();
+      final doc = await _firestore.collection(AppConfig.organizersCollection).doc(userId).get();
       return doc.data()?['bio'] as String?;
     } catch (e) {
       return null;

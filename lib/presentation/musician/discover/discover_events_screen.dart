@@ -5,6 +5,8 @@ import '../../../data/models/event.dart';
 import '../../../data/services/event_service.dart';
 import 'widgets/event_card.dart';
 import 'widgets/event_filters_bottom_sheet.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
+
 
 /// Discover events screen - for finding available gigs
 class DiscoverEventsScreen extends StatefulWidget {
@@ -70,8 +72,7 @@ class _DiscoverEventsScreenState extends State<DiscoverEventsScreen> {
 
   Widget _buildActiveFiltersChips() {
     return Container(
-      width: double.infinity,
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      width: double.infinity, padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingMedium, vertical: AppDimensions.spacingSmall),
       color: AppColors.greyLight.withValues(alpha: 0.3),
       child: Wrap(
         spacing: 8,
@@ -81,9 +82,9 @@ class _DiscoverEventsScreenState extends State<DiscoverEventsScreen> {
             Chip(
               label: Text(
                 '${_formatDate(_selectedStartDate!)} - ${_formatDate(_selectedEndDate!)}',
-                style: const TextStyle(fontSize: 12),
+                style: const TextStyle(fontSize: AppDimensions.fontSmall),
               ),
-              deleteIcon: const Icon(Icons.close, size: 16),
+              deleteIcon: const Icon(Icons.close, size: AppDimensions.iconSmall),
               onDeleted: () {
                 setState(() {
                   _selectedStartDate = null;
@@ -95,9 +96,9 @@ class _DiscoverEventsScreenState extends State<DiscoverEventsScreen> {
             Chip(
               label: Text(
                 'Within ${_maxDistance!.toInt()}km',
-                style: const TextStyle(fontSize: 12),
+                style: const TextStyle(fontSize: AppDimensions.fontSmall),
               ),
-              deleteIcon: const Icon(Icons.close, size: 16),
+              deleteIcon: const Icon(Icons.close, size: AppDimensions.iconSmall),
               onDeleted: () {
                 setState(() => _maxDistance = null);
               },
@@ -111,11 +112,11 @@ class _DiscoverEventsScreenState extends State<DiscoverEventsScreen> {
                 _maxDistance = null;
               });
             },
-            icon: const Icon(Icons.clear_all, size: 16),
-            label: const Text('Clear all', style: TextStyle(fontSize: 12)),
+            icon: const Icon(Icons.clear_all, size: AppDimensions.iconSmall),
+            label: const Text('Clear all', style: TextStyle(fontSize: AppDimensions.fontSmall)),
             style: TextButton.styleFrom(
               foregroundColor: AppColors.error,
-              padding: const EdgeInsets.symmetric(horizontal: 8),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingSmall),
             ),
           ),
         ],
@@ -142,11 +143,11 @@ class _DiscoverEventsScreenState extends State<DiscoverEventsScreen> {
 
         // Error state
         if (snapshot.hasError) {
-          print('FIRESTORE ERROR: ${snapshot.error}');
-          print('STACK TRACE: ${snapshot.stackTrace}');
+          debugPrint('FIRESTORE ERROR: ${snapshot.error}');
+          debugPrint('STACK TRACE: ${snapshot.stackTrace}');
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -155,19 +156,19 @@ class _DiscoverEventsScreenState extends State<DiscoverEventsScreen> {
                     size: 64,
                     color: AppColors.error.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   Text(
                     'Error loading events',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: AppColors.error,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     'Please try again later',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   ElevatedButton.icon(
                     onPressed: () => setState(() {}),
                     icon: const Icon(Icons.refresh),
@@ -190,7 +191,7 @@ class _DiscoverEventsScreenState extends State<DiscoverEventsScreen> {
         if (events.isEmpty) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -199,14 +200,14 @@ class _DiscoverEventsScreenState extends State<DiscoverEventsScreen> {
                     size: 80,
                     color: AppColors.grey.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingLarge),
                   Text(
                     _hasActiveFilters
                         ? 'No events match your filters'
                         : 'No events available',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     _hasActiveFilters
                         ? 'Try adjusting your filters'
@@ -244,12 +245,12 @@ class _DiscoverEventsScreenState extends State<DiscoverEventsScreen> {
           },
           color: AppColors.primary,
           child: ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             itemCount: events.length,
             itemBuilder: (context, index) {
               final event = events[index];
               return Padding(
-                padding: const EdgeInsets.only(bottom: 16),
+                padding: const EdgeInsets.only(bottom: AppDimensions.spacingMedium),
                 child: EventCard(
                   event: event,
                   userId: widget.userId,

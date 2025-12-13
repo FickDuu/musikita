@@ -3,7 +3,8 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../data/models/event_application.dart';
 import '../../../../data/services/event_service.dart';
 import 'organizer_application_card.dart';
-
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_limits.dart';
 class ApplicationsTab extends StatefulWidget{
   final String userId;
 
@@ -97,7 +98,7 @@ class _ApplicationsTabState extends State<ApplicationsTab> with SingleTickerProv
                           overflow: TextOverflow.ellipsis,
                         ),
                       ),
-                      const SizedBox(width: 4),
+                      const SizedBox(width: AppDimensions.spacingXSmall),
                       _buildCountBadge(label),
                     ],
                   ),
@@ -185,7 +186,7 @@ class _ApplicationsTabState extends State<ApplicationsTab> with SingleTickerProv
         if (snapshot.hasError) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -194,19 +195,19 @@ class _ApplicationsTabState extends State<ApplicationsTab> with SingleTickerProv
                     size: 64,
                     color: AppColors.error.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   Text(
                     'Error loading applications',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: AppColors.error,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     'Please try again later',
                     style: Theme.of(context).textTheme.bodySmall,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   ElevatedButton.icon(
                     onPressed: () => setState(() {}),
                     icon: const Icon(Icons.refresh),
@@ -239,11 +240,11 @@ class _ApplicationsTabState extends State<ApplicationsTab> with SingleTickerProv
         return RefreshIndicator(
           onRefresh: () async {
             setState(() {});
-            await Future.delayed(const Duration(milliseconds: 500));
+            await Future.delayed(const Duration(milliseconds: AppLimits.refreshThrottleDuration));
           },
           color: AppColors.primary,
           child: ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             itemCount: applications.length,
             itemBuilder: (context, index) {
               final application = applications[index];
@@ -290,7 +291,7 @@ class _ApplicationsTabState extends State<ApplicationsTab> with SingleTickerProv
 
     return Center(
       child: Padding(
-        padding: const EdgeInsets.all(32.0),
+        padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
@@ -299,13 +300,13 @@ class _ApplicationsTabState extends State<ApplicationsTab> with SingleTickerProv
               size: 80,
               color: AppColors.grey.withValues(alpha: 0.5),
             ),
-            const SizedBox(height: 24),
+            const SizedBox(height: AppDimensions.spacingLarge),
             Text(
               message,
               style: Theme.of(context).textTheme.titleLarge,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingSmall),
             Text(
               subtitle,
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(

@@ -2,13 +2,15 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import '../models/music_post.dart';
+import 'package:musikita/core/config/app_config.dart';
+import 'package:musikita/core/constants/app_limits.dart';
 
 /// Service for managing music posts
 class MusicService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   final FirebaseStorage _storage = FirebaseStorage.instance;
 
-  static const int maxFileSizeBytes = 10 * 1024 * 1024; // 10MB
+  static const int maxFileSizeBytes = AppLimits.maxAudioSizeBytes; // 10MB
 
   /// Upload audio file to Firebase Storage
   Future<String> uploadAudioFile({
@@ -19,12 +21,12 @@ class MusicService {
       // Check file size
       final fileSize = await audioFile.length();
       if (fileSize > maxFileSizeBytes) {
-        throw Exception('File size exceeds 10MB limit');
+        throw Exception('File size exceeds ${AppLimits.maxAudioSizeBytes ~/ (1024 * 1024)}MB limit');
       }
 
       // Create unique filename
       final timestamp = DateTime.now().millisecondsSinceEpoch;
-      final ref = _storage.ref().child('music/$userId/audio_$timestamp.mp3');
+      final ref = _storage.ref().child('${AppConfig.musicFilesPath}/$userId/audio_$timestamp.mp3');
 
       // Upload file
       final uploadTask = await ref.putFile(audioFile);
@@ -45,7 +47,7 @@ class MusicService {
     required String audioUrl,
   }) async {
     try {
-      final docRef = _firestore.collection('music_posts').doc();
+      final docRef = _firestore.collection(AppConfig.musicPostsCollection).doc();
 
       final musicPost = MusicPost(
         id: docRef.id,
@@ -68,7 +70,7 @@ class MusicService {
   /// Get all music posts for a user
   Stream<List<MusicPost>> getUserMusicPosts(String userId) {
     return _firestore
-        .collection('music_posts')
+        .collection(AppConfig.musicPostsCollection)
         .where('userId', isEqualTo: userId)
         .orderBy('uploadedAt', descending: true)
         .snapshots()
@@ -91,7 +93,7 @@ class MusicService {
       if (title != null) updates['title'] = title;
       if (genre != null) updates['genre'] = genre;
 
-      await _firestore.collection('music_posts').doc(postId).update(updates);
+      await _firestore.collection(AppConfig.musicPostsCollection).doc(postId).update(updates);
     } catch (e) {
       throw Exception('Failed to update music post: ${e.toString()}');
     }
@@ -104,7 +106,7 @@ class MusicService {
   }) async {
     try {
       // Delete from Firestore
-      await _firestore.collection('music_posts').doc(postId).delete();
+      await _firestore.collection(AppConfig.musicPostsCollection).doc(postId).delete();
 
       // Delete audio file from Storage
       try {
@@ -121,7 +123,7 @@ class MusicService {
   /// Get single music post
   Future<MusicPost?> getMusicPost(String postId) async {
     try {
-      final doc = await _firestore.collection('music_posts').doc(postId).get();
+      final doc = await _firestore.collection(AppConfig.musicPostsCollection).doc(postId).get();
       if (!doc.exists) return null;
       return MusicPost.fromJson(doc.data()!);
     } catch (e) {

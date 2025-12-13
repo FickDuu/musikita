@@ -1,6 +1,7 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/musician.dart';
 import '../models/music_post.dart';
+import 'package:musikita/core/config/app_config.dart';
 
 /// Service for discovering and browsing other musicians
 class MusicianDiscoveryService {
@@ -11,7 +12,7 @@ class MusicianDiscoveryService {
   Stream<List<Musician>> getMusiciansStream({String? excludeUserId}) {
     try {
       Query query = _firestore
-          .collection('musicians')
+          .collection(AppConfig.musicPostsCollection)
           .orderBy('createdAt', descending: true);
 
       return query.snapshots().map((snapshot) {
@@ -38,7 +39,7 @@ class MusicianDiscoveryService {
   Future<Musician?> getMusicianById(String musicianId) async {
     try {
       final doc =
-      await _firestore.collection('musicians').doc(musicianId).get();
+      await _firestore.collection(AppConfig.musiciansCollection).doc(musicianId).get();
 
       if (!doc.exists) {
         return null;
@@ -57,7 +58,7 @@ class MusicianDiscoveryService {
   Stream<List<MusicPost>> getMusicianMusicStream(String musicianId) {
     try {
       return _firestore
-          .collection('music_posts')
+          .collection(AppConfig.musicPostsCollection)
           .where('userId', isEqualTo: musicianId)
           .orderBy('uploadedAt', descending: true)
           .snapshots()
@@ -147,21 +148,10 @@ class MusicianDiscoveryService {
   /// Get total number of musicians
   Future<int> getMusicianCount() async {
     try {
-      final snapshot = await _firestore.collection('musicians').get();
+      final snapshot = await _firestore.collection(AppConfig.musiciansCollection).get();
       return snapshot.docs.length;
     } catch (e) {
       throw Exception('Failed to get musician count: $e');
     }
   }
-
-// TODO: Implement getActiveMusicians() with Cloud Functions
-// This requires counting posts for each musician which is expensive.
-// Better approach: Use Cloud Functions to maintain a 'musicPostCount' field
-// in the musicians collection, updated via Firestore triggers.
-// Example implementation:
-// - Cloud Function triggers on music_posts create/delete
-// - Updates musicians/{musicianId}/musicPostCount
-// - Query: .orderBy('musicPostCount', descending: true).limit(10)
-//
-// Future<List<Musician>> getActiveMusicians({int limit = 10}) async { ... }
 }

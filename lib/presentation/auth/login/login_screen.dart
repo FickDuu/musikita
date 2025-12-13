@@ -6,6 +6,7 @@ import '../../../core/constants/app_strings.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../core/utils/validators.dart';
 import '../../../data/services/auth_service.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
 
 /// Login screen for existing users
 class LoginScreen extends StatefulWidget {
@@ -86,13 +87,13 @@ class _LoginScreenState extends State<LoginScreen> {
       body: AppBackground(
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(AppDimensions.spacingLarge),
             child: Form(
               key: _formKey,
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spacingXLarge),
 
                   // Logo
                   Center(
@@ -102,7 +103,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       fit: BoxFit.contain,
                     ),
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: AppDimensions.spacingXXLarge),
 
                   // Title
                   Text(
@@ -113,7 +114,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
 
                   // Subtitle
                   Text(
@@ -123,7 +124,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 48),
+                  const SizedBox(height: AppDimensions.spacingXXLarge),
 
                   // Email Field
                   TextFormField(
@@ -136,7 +137,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     validator: Validators.email,
                     textInputAction: TextInputAction.next,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Password Field
                   TextFormField(
@@ -158,7 +159,7 @@ class _LoginScreenState extends State<LoginScreen> {
                     textInputAction: TextInputAction.done,
                     onFieldSubmitted: (_) => _handleLogin(),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
 
                   // Forgot Password
                   Align(
@@ -175,33 +176,33 @@ class _LoginScreenState extends State<LoginScreen> {
                       child: const Text(AppStrings.forgotPassword),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingLarge),
 
                   // Login Button
                   SizedBox(
-                    height: 56,
+                    height: AppDimensions.buttonHeightLarge,
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _handleLogin,
                       child: _isLoading
                           ? const SizedBox(
-                        height: 24,
-                        width: 24,
+                        height: AppDimensions.progressIndicatorMedium,
+                        width: AppDimensions.progressIndicatorMedium,
                         child: CircularProgressIndicator(
-                          strokeWidth: 2,
+                          strokeWidth: AppDimensions.progressIndicatorStroke,
                           color: AppColors.white,
                         ),
                       )
                           : const Text(AppStrings.signIn),
                     ),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingLarge),
 
                   // Divider
                   Row(
                     children: [
                       const Expanded(child: Divider()),
                       Padding(
-                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingMedium),
                         child: Text(
                           'OR',
                           style: Theme.of(context).textTheme.bodySmall,
@@ -210,7 +211,7 @@ class _LoginScreenState extends State<LoginScreen> {
                       const Expanded(child: Divider()),
                     ],
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingLarge),
 
                   // Sign Up Link
                   Row(

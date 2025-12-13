@@ -1,6 +1,8 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/conversation.dart';
 import '../models/message.dart';
+import 'package:musikita/core/config/app_config.dart';
+import 'package:musikita/core/constants/app_limits.dart';
 
 class MessagingService {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
@@ -17,8 +19,7 @@ class MessagingService {
     String? otherUserImageUrl,
   }) async {
     final conversationId = Conversation.generateId(currentUserId, otherUserId);
-    final conversationRef = _firestore.collection('conversations').doc(
-        conversationId);
+    final conversationRef = _firestore.collection(AppConfig.conversationsCollection).doc(conversationId);
     final conversationDoc = await conversationRef.get();
 
     if (conversationDoc.exists) {
@@ -56,7 +57,7 @@ class MessagingService {
 
   //Get a stream of all conversations for a user
   Stream<List<Conversation>> getConversationsStream(String userId) {
-    return _firestore.collection('conversations')
+    return _firestore.collection(AppConfig.conversationsCollection)
       .where('participants', arrayContains: userId)
       .orderBy('updatedAt', descending: true)
       .snapshots()
@@ -70,7 +71,7 @@ class MessagingService {
   //get chat id
   Future<Conversation?> getConversation(String conversationId) async {
     final doc = await _firestore
-        .collection('conversations')
+        .collection(AppConfig.conversationsCollection)
         .doc(conversationId)
         .get();
     if (!doc.exists) return null;
@@ -79,7 +80,7 @@ class MessagingService {
 
   //get total unread message count for a user across all conversations
   Stream<int> getTotalUnreadCountStream(String userId) {
-    return _firestore.collection('conversations')
+    return _firestore.collection(AppConfig.conversationsCollection)
         .where('participants', arrayContains: userId)
         .snapshots()
         .map((snapshot) {
@@ -97,7 +98,7 @@ class MessagingService {
 
   //mark chat as read
   Future<void> markConversationAsRead(String conversationId, String userId) async{
-    await _firestore.collection('conversations').doc(conversationId).update({
+    await _firestore.collection(AppConfig.conversationsCollection).doc(conversationId).update({
       'unreadCount.$userId': 0,
     });
   }
@@ -113,7 +114,7 @@ class MessagingService {
     final now = DateTime.now();
 
     //create message doc
-    final messageRef = _firestore.collection('conversations')
+    final messageRef = _firestore.collection(AppConfig.conversationsCollection)
         .doc(conversationId).collection('messages').doc();
 
     final message = Message(
@@ -131,7 +132,7 @@ class MessagingService {
     //add message
     batch.set(messageRef, message.toJson());
 
-    final conversationRef = _firestore.collection('conversations').doc(conversationId);
+    final conversationRef = _firestore.collection(AppConfig.conversationsCollection).doc(conversationId);
     batch.update(conversationRef, {
       'lastMessage': text,
       'lastMessageTime': Timestamp.fromDate(now),
@@ -145,8 +146,8 @@ class MessagingService {
 
   //get a stream of messages in conversation
   Stream<List<Message>> getMessagesStream(String conversationId){
-    return _firestore.collection('conversations')
-        .doc(conversationId).collection('messages')
+    return _firestore.collection(AppConfig.conversationsCollection)
+        .doc(conversationId).collection(AppConfig.messagesCollection)
         .orderBy('timestamp', descending: false)
         .snapshots().map((snapshot){
       return snapshot.docs
@@ -157,11 +158,11 @@ class MessagingService {
   //load older messages, get pagination
   Future<List<Message>> getMessagesPaginated({
     required String conversationId,
-    int limit = 50,
+    int limit = AppLimits.messagesPerPage,
     DateTime? before,
   }) async{
-    Query query = _firestore.collection('conversations')
-        .doc(conversationId).collection('messages')
+    Query query = _firestore.collection(AppConfig.conversationsCollection)
+        .doc(conversationId).collection(AppConfig.messagesCollection)
         .orderBy('timestamp', descending: true).limit(limit);
 
     if(before != null){
@@ -177,11 +178,11 @@ class MessagingService {
   }
 
   Future<void> markMessageAsRead(String conversationId, String messageId) async{
-    await _firestore.collection('conversations').doc(conversationId)
+    await _firestore.collection(AppConfig.conversationsCollection).doc(conversationId)
         .collection('messages').doc(messageId).update({'read': true});
   }
   Future<void> deleteMessage(String conversationId, String messageId) async{
-    await _firestore.collection('conversations').doc(conversationId)
+    await _firestore.collection(AppConfig.conversationsCollection).doc(conversationId)
         .collection('messages').doc(messageId).delete();
   }
 
@@ -189,7 +190,7 @@ class MessagingService {
   //check if a chat exist between users
   Future<bool> conversationExists(String userId1, String userId2) async{
     final conversationId = Conversation.generateId(userId1, userId2);
-    final doc = await _firestore.collection('conversations').doc(conversationId).get();
+    final doc = await _firestore.collection(AppConfig.conversationsCollection).doc(conversationId).get();
     return doc.exists;
   }
 
@@ -201,7 +202,7 @@ class MessagingService {
     String? profileImageUrl,
   }) async{
     //find for all conversation where user is a participant
-    final conversations = await _firestore.collection('conversations')
+    final conversations = await _firestore.collection(AppConfig.conversationsCollection)
         .where('participants', arrayContains: userId).get();
 
     final batch = _firestore.batch();

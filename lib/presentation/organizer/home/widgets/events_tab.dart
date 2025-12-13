@@ -4,7 +4,10 @@ import '../../../../core/constants/app_colors.dart';
 import '../../../../data/models/event.dart';
 import '../../../../data/models/event_application.dart';
 import '../../../../data/services/event_service.dart';
-import '../../create_event/create_event_screen.dart';
+import '../../events/create_event_screen.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_limits.dart';
+
 
 /// Events tab - shows organizer's posted events with full functionality
 class EventsTab extends StatelessWidget {
@@ -35,7 +38,7 @@ class EventsTab extends StatelessWidget {
         if (snapshot.hasError) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -44,14 +47,14 @@ class EventsTab extends StatelessWidget {
                     size: 64,
                     color: AppColors.error.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   Text(
                     'Error loading events',
                     style: Theme.of(context).textTheme.titleMedium?.copyWith(
                       color: AppColors.error,
                     ),
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     'Please try again later',
                     style: Theme.of(context).textTheme.bodySmall,
@@ -68,7 +71,7 @@ class EventsTab extends StatelessWidget {
         if (events.isEmpty) {
           return Center(
             child: Padding(
-              padding: const EdgeInsets.all(32.0),
+              padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
               child: Column(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
@@ -77,12 +80,12 @@ class EventsTab extends StatelessWidget {
                     size: 80,
                     color: AppColors.grey.withValues(alpha: 0.5),
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingLarge),
                   Text(
                     'No events yet',
                     style: Theme.of(context).textTheme.titleLarge,
                   ),
-                  const SizedBox(height: 8),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Text(
                     'Create your first event to find musicians',
                     style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -90,7 +93,7 @@ class EventsTab extends StatelessWidget {
                     ),
                     textAlign: TextAlign.center,
                   ),
-                  const SizedBox(height: 24),
+                  const SizedBox(height: AppDimensions.spacingLarge),
                   ElevatedButton.icon(
                     onPressed: () => _navigateToCreateEvent(context, userId),
                     icon: const Icon(Icons.add),
@@ -106,11 +109,11 @@ class EventsTab extends StatelessWidget {
         return RefreshIndicator(
           onRefresh: () async {
             // Refresh will happen automatically via stream
-            await Future.delayed(const Duration(milliseconds: 500));
+            await Future.delayed(const Duration(milliseconds: AppLimits.refreshThrottleDuration));
           },
           color: AppColors.primary,
           child: ListView.builder(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             itemCount: events.length,
             itemBuilder: (context, index) {
               final event = events[index];
@@ -254,7 +257,7 @@ class _EventCard extends StatelessWidget {
         children: [
           // Event header with status badge
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             decoration: BoxDecoration(
               color: _getStatusColor().withValues(alpha: 0.1),
               borderRadius: const BorderRadius.vertical(
@@ -379,7 +382,7 @@ class _EventCard extends StatelessWidget {
 
           // Event details
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -388,14 +391,14 @@ class _EventCard extends StatelessWidget {
                   Icons.access_time,
                   event.formattedTimeRange,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Location
                 _buildInfoRow(
                   Icons.location_on,
                   event.location,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Payment
                 _buildInfoRow(
@@ -404,7 +407,7 @@ class _EventCard extends StatelessWidget {
                   valueColor: AppColors.primary,
                   valueBold: true,
                 ),
-                const SizedBox(height: 8),
+                const SizedBox(height: AppDimensions.spacingSmall),
 
                 // Slots
                 _buildInfoRow(

@@ -5,6 +5,7 @@ import '../../../../data/models/event.dart';
 import '../../../../data/models/event_application.dart';
 import '../../../../data/services/event_service.dart';
 import 'event_application_card.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
 
 /// Calendar tab - shows confirmed, pending, and past event applications
 class CalendarTab extends StatefulWidget {
@@ -43,7 +44,7 @@ class _CalendarTabState extends State<CalendarTab> {
             // Calendar widget
             _buildCalendar(),
 
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacingMedium),
 
             // Confirmed Events Section
             _buildSection(
@@ -55,7 +56,7 @@ class _CalendarTabState extends State<CalendarTab> {
               child: _buildConfirmedEvents(),
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.radiusMedium),
 
             // Pending Applications Section
             _buildSection(
@@ -67,7 +68,7 @@ class _CalendarTabState extends State<CalendarTab> {
               child: _buildPendingApplications(),
             ),
 
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.radiusMedium),
 
             // Past Events Section
             _buildSection(
@@ -88,15 +89,15 @@ class _CalendarTabState extends State<CalendarTab> {
 
   Widget _buildCalendar() {
     return Container(
-      margin: const EdgeInsets.all(16),
+      margin: const EdgeInsets.all(AppDimensions.spacingMedium),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: AppDimensions.cardShadowBlur,
+            offset: const Offset(0, AppDimensions.cardShadowOffsetY),
           ),
         ],
       ),
@@ -143,10 +144,10 @@ class _CalendarTabState extends State<CalendarTab> {
     required Widget child,
   }) {
     return Container(
-      margin: const EdgeInsets.symmetric(horizontal: 16),
+      margin: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingMedium),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
@@ -160,9 +161,9 @@ class _CalendarTabState extends State<CalendarTab> {
           // Section header
           InkWell(
             onTap: onToggle,
-            borderRadius: const BorderRadius.vertical(top: Radius.circular(16)),
+            borderRadius: const BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusLarge)),
             child: Container(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacingMedium),
               decoration: BoxDecoration(
                 color: color.withValues(alpha: 0.1),
                 borderRadius: const BorderRadius.vertical(
@@ -171,8 +172,8 @@ class _CalendarTabState extends State<CalendarTab> {
               ),
               child: Row(
                 children: [
-                  Icon(icon, color: color, size: 24),
-                  const SizedBox(width: 12),
+                  Icon(icon, color: color, size: AppDimensions.iconMedium),
+                  const SizedBox(width: AppDimensions.radiusMedium),
                   Expanded(
                     child: Text(
                       title,
@@ -224,7 +225,7 @@ class _CalendarTabState extends State<CalendarTab> {
         }
 
         return Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppDimensions.spacingMedium),
           child: Column(
             children: applications.map((application) {
               return FutureBuilder<Event?>(
@@ -277,7 +278,7 @@ class _CalendarTabState extends State<CalendarTab> {
         }
 
         return Padding(
-          padding: const EdgeInsets.all(16),
+          padding: const EdgeInsets.all(AppDimensions.spacingMedium),
           child: Column(
             children: applications.map((application) {
               return FutureBuilder<Event?>(
@@ -354,7 +355,7 @@ class _CalendarTabState extends State<CalendarTab> {
               );
             }
             return Padding(
-              padding: const EdgeInsets.all(16),
+              padding: const EdgeInsets.all(AppDimensions.spacingMedium),
               child: Column(
                 children: pastEvents.map((item) {
                   final application = item['application'] as EventApplication;
@@ -385,16 +386,16 @@ class _CalendarTabState extends State<CalendarTab> {
 
   Widget _buildErrorState() {
     return Padding(
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
       child: Center(
         child: Column(
           children: [
             Icon(
               Icons.error_outline,
-              size: 48,
+              size: AppDimensions.spacingXXLarge,
               color: AppColors.error.withValues(alpha: 0.5),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.radiusMedium),
             Text(
               'Error loading events',
               style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -413,7 +414,7 @@ class _CalendarTabState extends State<CalendarTab> {
     required String subtitle,
   }) {
     return Padding(
-      padding: const EdgeInsets.all(32),
+      padding: const EdgeInsets.all(AppDimensions.spacingXLarge),
       child: Center(
         child: Column(
           children: [
@@ -422,13 +423,13 @@ class _CalendarTabState extends State<CalendarTab> {
               size: 64,
               color: AppColors.grey.withValues(alpha: 0.5),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacingMedium),
             Text(
               message,
               style: Theme.of(context).textTheme.titleMedium,
               textAlign: TextAlign.center,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingSmall),
             Text(
               subtitle,
               style: Theme.of(context).textTheme.bodySmall?.copyWith(

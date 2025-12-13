@@ -4,6 +4,7 @@ import '../../../core/constants/app_colors.dart';
 import '../../../data/models/conversation.dart';
 import '../../../data/services/messaging_service.dart';
 import 'chat_screen.dart';
+import '../../../core/constants/app_dimensions.dart';
 
 /// Messages screen showing list of conversations
 class MessagesScreen extends StatefulWidget {
@@ -41,7 +42,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   Text(
                     'Error loading conversations',
                     style: Theme.of(context).textTheme.titleMedium,
@@ -69,7 +70,7 @@ class _MessagesScreenState extends State<MessagesScreen> {
                     size: 64,
                     color: AppColors.grey.withValues(alpha: .5),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   Text(
                     'No conversations yet',
                     style: Theme.of(context).textTheme.titleLarge?.copyWith(
@@ -152,7 +153,7 @@ class _ConversationListItem extends StatelessWidget {
               overflow: TextOverflow.ellipsis,
             ),
           ),
-          const SizedBox(width: 8),
+          const SizedBox(width: AppDimensions.spacingSmall),
           _buildRoleBadge(otherParticipant.role),
         ],
       ),
@@ -178,7 +179,7 @@ class _ConversationListItem extends StatelessWidget {
               ),
             ),
           if (hasUnread) ...[
-            const SizedBox(height: 4),
+            const SizedBox(height: AppDimensions.spacingXSmall),
             _buildUnreadBadge(unreadCount),
           ],
         ],
@@ -190,7 +191,7 @@ class _ConversationListItem extends StatelessWidget {
     if (participant.profileImageUrl != null) {
       return CircleAvatar(
         backgroundImage: NetworkImage(participant.profileImageUrl!),
-        radius: 24,
+        radius: AppDimensions.avatarRadiusMedium,
       );
     }
 
@@ -198,7 +199,7 @@ class _ConversationListItem extends StatelessWidget {
       backgroundColor: participant.role == 'musician'
           ? AppColors.primary.withValues(alpha: .1)
           : AppColors.secondary.withValues(alpha: .1),
-      radius: 24,
+      radius: AppDimensions.avatarRadiusMedium,
       child: Text(
         participant.name[0].toUpperCase(),
         style: TextStyle(
@@ -212,12 +213,12 @@ class _ConversationListItem extends StatelessWidget {
 
   Widget _buildRoleBadge(String role) {
     return Container(
-      padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingSmall, vertical: 2),
       decoration: BoxDecoration(
         color: role == 'musician'
             ? AppColors.primary.withValues(alpha: 0.1)
             : AppColors.secondary.withValues(alpha: 0.1),
-        borderRadius: BorderRadius.circular(12),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
       ),
       child: Text(
         role == 'musician' ? 'Musician' : 'Organizer',
@@ -238,8 +239,8 @@ class _ConversationListItem extends StatelessWidget {
         shape: BoxShape.circle,
       ),
       constraints: const BoxConstraints(
-        minWidth: 20,
-        minHeight: 20,
+        minWidth: AppDimensions.iconSmall,
+        minHeight: AppDimensions.iconSmall,
       ),
       child: Center(
         child: Text(

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import '../../core/config/app_config.dart';
 
 /// Music post model representing an uploaded song
 class MusicPost {
@@ -72,23 +73,6 @@ class MusicPost {
 class MusicGenres {
   static const List<String> genres = [
     'Not Tagged',
-    'Rock',
-    'Pop',
-    'Jazz',
-    'Blues',
-    'Classical',
-    'Hip Hop',
-    'R&B',
-    'Country',
-    'Electronic',
-    'Folk',
-    'Metal',
-    'Indie',
-    'Alternative',
-    'Soul',
-    'Reggae',
-    'Punk',
-    'Acoustic',
-    'Experimental',
+    ...AppConfig.supportedGenres,
   ];
 }

@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:musikita/core/config/app_config.dart';
 import '../models/organizer.dart';
 
 class OrganizerService {
@@ -7,7 +8,7 @@ class OrganizerService {
   /// Get organizer by ID
   Future<Organizer?> getOrganizerById(String organizerId) async {
     try {
-      final doc = await _firestore.collection('organizers').doc(organizerId).get();
+      final doc = await _firestore.collection(AppConfig.organizersCollection).doc(organizerId).get();
 
       if (!doc.exists) {
         return null;
@@ -15,15 +16,14 @@ class OrganizerService {
 
       return _fromFirestore(doc);
     } catch (e) {
-      print('Error fetching organizer: $e');
-      return null;
+      throw Exception('Error fetching organizer: $e');
     }
   }
 
   /// Get all organizers (for potential future features)
   Stream<List<Organizer>> getAllOrganizers() {
     return _firestore
-        .collection('organizers')
+        .collection(AppConfig.organizersCollection)
         .orderBy('organizerName')
         .snapshots()
         .map((snapshot) {
@@ -37,7 +37,7 @@ class OrganizerService {
   Future<List<Organizer>> searchOrganizers(String query) async {
     try {
       final snapshot = await _firestore
-          .collection('organizers')
+          .collection(AppConfig.organizersCollection)
           .where('organizerName', isGreaterThanOrEqualTo: query)
           .where('organizerName', isLessThanOrEqualTo: '$query\uf8ff')
           .get();
@@ -46,8 +46,7 @@ class OrganizerService {
           .map((doc) => _fromFirestore(doc))
           .toList();
     } catch (e) {
-      print('Error searching organizers: $e');
-      return [];
+      throw Exception('Error searching organizers: $e');
     }
   }
 

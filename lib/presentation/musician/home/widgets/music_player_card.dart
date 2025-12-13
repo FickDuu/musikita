@@ -6,6 +6,8 @@ import '../../../../data/models/music_post.dart';
 import '../../../../data/services/musician_discovery_service.dart';
 import '../../../common/widgets/artist_info_bottom_sheet.dart';
 import '../../profile/musician_profile_screen.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_limits.dart';
 
 /// Music player widget with play/pause and progress bar
 /// Displays a single music post with playback controls
@@ -112,6 +114,7 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
           SnackBar(
             content: Text('Error playing audio: $e'),
             backgroundColor: AppColors.error,
+            duration: Duration(seconds: AppLimits.errorSnackbarDurationSeconds),
           ),
         );
       }
@@ -163,18 +166,18 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
             content: Row(
               children: [
                 SizedBox(
-                  width: 16,
-                  height: 16,
+                  width: AppDimensions.progressIndicatorSmall,
+                  height: AppDimensions.progressIndicatorSmall,
                   child: CircularProgressIndicator(
-                    strokeWidth: 2,
+                    strokeWidth: AppDimensions.progressIndicatorStroke,
                     color: Colors.white,
                   ),
                 ),
-                SizedBox(width: 12),
+                SizedBox(width: AppDimensions.spacingSmall),
                 Text('Loading artist info...'),
               ],
             ),
-            duration: Duration(seconds: 1),
+            duration: Duration(seconds: AppLimits.snackbarDurationSeconds),
           ),
         );
       }
@@ -188,6 +191,7 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
             const SnackBar(
               content: Text('Could not load artist information'),
               backgroundColor: AppColors.error,
+              duration: Duration(seconds: AppLimits.errorSnackbarDurationSeconds),
             ),
           );
         }
@@ -219,6 +223,7 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
           SnackBar(
             content: Text('Error loading artist: $e'),
             backgroundColor: AppColors.error,
+            duration: Duration(seconds: AppLimits.errorSnackbarDurationSeconds),
           ),
         );
       }
@@ -230,7 +235,7 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
       context: context,
       backgroundColor: AppColors.white,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.bottomSheetRadius)),
       ),
       builder: (context) => SafeArea(
         child: Column(
@@ -238,12 +243,12 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
           children: [
             // Handle bar
             Container(
-              width: 40,
-              height: 4,
-              margin: const EdgeInsets.symmetric(vertical: 12),
+              width: AppDimensions.bottomSheetHandleWidth,
+              height: AppDimensions.bottomSheetHandleHeight,
+              margin: const EdgeInsets.symmetric(vertical: AppDimensions.spacingSmall),
               decoration: BoxDecoration(
                 color: AppColors.greyLight,
-                borderRadius: BorderRadius.circular(2),
+                borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
               ),
             ),
 
@@ -272,7 +277,7 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
               },
             ),
 
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingSmall),
           ],
         ),
       ),
@@ -284,15 +289,15 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
     final musicPost = widget.musicPost;
 
     return Container(
-      padding: const EdgeInsets.all(16),
+      padding: const EdgeInsets.all(AppDimensions.cardPadding),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: AppDimensions.cardShadowBlur,
+            offset: const Offset(0, AppDimensions.cardShadowOffsetY),
           ),
         ],
       ),
@@ -315,7 +320,7 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
                       maxLines: 2,
                       overflow: TextOverflow.ellipsis,
                     ),
-                    const SizedBox(height: 4),
+                    const SizedBox(height: AppDimensions.spacingXSmall),
 
                     // Artist name (tappable) - only show if showArtistName is true
                     if (widget.showArtistName) ...[
@@ -339,7 +344,7 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
                                 overflow: TextOverflow.ellipsis,
                               ),
                             ),
-                            const SizedBox(width: 4),
+                            const SizedBox(width: AppDimensions.spacingXSmall),
                             const Icon(
                               Icons.info_outline,
                               size: 14,
@@ -348,7 +353,7 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
                           ],
                         ),
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacingXSmall),
                     ],
 
                     // Genre and upload date
@@ -357,12 +362,12 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
                         if (musicPost.genre != null) ...[
                           Container(
                             padding: const EdgeInsets.symmetric(
-                              horizontal: 8,
+                              horizontal: AppDimensions.spacingSmall,
                               vertical: 2,
                             ),
                             decoration: BoxDecoration(
                               color: AppColors.primary.withValues(alpha: 0.1),
-                              borderRadius: BorderRadius.circular(12),
+                              borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
                             ),
                             child: Text(
                               musicPost.genre!,
@@ -375,7 +380,7 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
                               ),
                             ),
                           ),
-                          const SizedBox(width: 8),
+                          const SizedBox(width: AppDimensions.spacingSmall),
                         ],
                         Text(
                           _formatDate(musicPost.uploadedAt),
@@ -401,7 +406,7 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
             ],
           ),
 
-          const SizedBox(height: 16),
+          const SizedBox(height: AppDimensions.spacingMedium),
 
           // Player controls
           Row(
@@ -416,23 +421,23 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
                   onPressed: _isLoading ? null : _togglePlayPause,
                   icon: _isLoading
                       ? const SizedBox(
-                    width: 24,
-                    height: 24,
+                    width: AppDimensions.iconMedium,
+                    height: AppDimensions.iconMedium,
                     child: CircularProgressIndicator(
-                      strokeWidth: 2,
+                      strokeWidth: AppDimensions.progressIndicatorStroke,
                       color: AppColors.white,
                     ),
                   )
                       : Icon(
                     _isPlaying ? Icons.pause : Icons.play_arrow,
                     color: AppColors.white,
-                    size: 28,
+                    size: AppDimensions.tabIconSize,
                   ),
-                  iconSize: 28,
+                  iconSize: AppDimensions.tabIconSize,
                 ),
               ),
 
-              const SizedBox(width: 12),
+              const SizedBox(width: AppDimensions.spacingSmall),
 
               // Progress bar and time
               Expanded(
@@ -441,12 +446,12 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
                     // Progress slider
                     SliderTheme(
                       data: SliderTheme.of(context).copyWith(
-                        trackHeight: 4,
+                        trackHeight: AppDimensions.spacingXSmall,
                         thumbShape: const RoundSliderThumbShape(
                           enabledThumbRadius: 6,
                         ),
-                        overlayShape: const RoundSliderOverlayShape(
-                          overlayRadius: 12,
+                        overlayShape: RoundSliderOverlayShape(
+                          overlayRadius: AppDimensions.spacingSmall,
                         ),
                         activeTrackColor: AppColors.primary,
                         inactiveTrackColor: AppColors.greyLight,
@@ -467,7 +472,7 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
 
                     // Time labels
                     Padding(
-                      padding: const EdgeInsets.symmetric(horizontal: 8),
+                      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingSmall),
                       child: Row(
                         mainAxisAlignment: MainAxisAlignment.spaceBetween,
                         children: [

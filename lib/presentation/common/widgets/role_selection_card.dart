@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../data/models/user_role.dart';
+import 'package:musikita/core/constants/app_dimensions.dart';
 
 class RoleSelectionCard extends StatelessWidget{
   final UserRole role;
@@ -18,23 +19,23 @@ class RoleSelectionCard extends StatelessWidget{
   Widget build(BuildContext context){
     return InkWell(
       onTap: onTap,
-      borderRadius: BorderRadius.circular(16),
+      borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
       child: Container(
-        padding: const EdgeInsets.all(20),
+        padding: const EdgeInsets.all(AppDimensions.radiusXLarge),
         decoration: BoxDecoration(
           color: isSelected ? AppColors.primary.withValues(alpha: 0.1) : AppColors.white,
           border: Border.all(
             color: isSelected ? AppColors.primary : AppColors.border,
-            width: isSelected ? 2 : 1,
+            width: isSelected ? AppDimensions.borderWidthThick : AppDimensions.borderWidth,
           ),
-          borderRadius: BorderRadius.circular(16),
+          borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         ),
 
         child: Row(
           children: [
             //Icon
             Container(
-              padding: const EdgeInsets.all(12),
+              padding: const EdgeInsets.all(AppDimensions.radiusMedium),
               decoration: BoxDecoration(
                 color: isSelected ? AppColors.primary : AppColors.greyLight,
                 shape: BoxShape.circle,
@@ -42,7 +43,7 @@ class RoleSelectionCard extends StatelessWidget{
               child: Icon(
                 _getRoleIcon(),
                 color: isSelected ? AppColors.white : AppColors.grey,
-                size: 28,
+                size: AppDimensions.tabIconSize,
               ),
             ),
             const SizedBox(width:16),
@@ -58,7 +59,7 @@ class RoleSelectionCard extends StatelessWidget{
                       fontWeight: FontWeight.w600,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppDimensions.spacingXSmall),
                   Text(
                     role.description,
                     style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -72,13 +73,13 @@ class RoleSelectionCard extends StatelessWidget{
             if(isSelected) const Icon(
               Icons.check_circle,
               color: AppColors.primary,
-              size: 28,
+              size: AppDimensions.tabIconSize,
             )
             else
               Icon(
                 Icons.circle_outlined,
                 color: AppColors.grey.withValues(alpha: 0.3),
-                size: 28,
+                size: AppDimensions.tabIconSize,
               ),
           ],
         ),

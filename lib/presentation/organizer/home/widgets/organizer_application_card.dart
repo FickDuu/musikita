@@ -3,7 +3,9 @@ import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
 import '../../../../data/models/event_application.dart';
 import '../../../../data/services/event_service.dart';
-import '../../../musician/home/widgets/musician_home_screen.dart';
+import '../../../musician/home/musician_home_screen.dart';
+import '../../../../core/constants/app_dimensions.dart';
+import '../../../../core/constants/app_limits.dart';
 
 //organizer application card to display musician application
 class OrganizerApplicationCard extends StatefulWidget{
@@ -55,12 +57,12 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Accept ${widget.application.musicianName}\'s application for:'),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingSmall),
             Text(
               widget.application.eventName,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 12),
+            const SizedBox(height: AppDimensions.spacingSmall),
             const Text(
               'This will confirm the booking and notif the musician',
               style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
@@ -134,12 +136,12 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             Text('Reject ${widget.application.musicianName}\'s application for:'),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingSmall),
             Text(
               widget.application.eventName,
               style: const TextStyle(fontWeight: FontWeight.bold),
             ),
-            const SizedBox(height: 16),
+            const SizedBox(height: AppDimensions.spacingMedium),
             TextField(
               controller: reasonController,
               decoration: const InputDecoration(
@@ -150,7 +152,7 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
               maxLines: 3,
               maxLength: 200,
             ),
-            const SizedBox(height: 8),
+            const SizedBox(height: AppDimensions.spacingSmall),
             const Text(
               'THe musician will be notified.',
               style: TextStyle(fontSize: 12, color: AppColors.textSecondary),
@@ -231,19 +233,19 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
     final isPending = widget.application.isPending;
 
     return Container(
-      margin: const EdgeInsets.only(bottom: 16),
+      margin: const EdgeInsets.only(bottom: AppDimensions.spacingMedium),
       decoration: BoxDecoration(
         color: AppColors.white,
-        borderRadius: BorderRadius.circular(16),
+        borderRadius: BorderRadius.circular(AppDimensions.radiusLarge),
         border: Border.all(
           color: _statusColor.withValues(alpha: 0.3),
-          width: 2,
+          width: AppDimensions.borderWidthThick,
         ),
         boxShadow: [
           BoxShadow(
             color: AppColors.shadow,
-            blurRadius: 8,
-            offset: const Offset(0, 2),
+            blurRadius: AppDimensions.cardShadowBlur,
+            offset: const Offset(0, AppDimensions.cardShadowOffsetY),
           ),
         ],
       ),
@@ -252,7 +254,7 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
         children: [
           // Header with status
           Container(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             decoration: BoxDecoration(
               color: _statusColor.withValues(alpha: 0.1),
               borderRadius: const BorderRadius.vertical(
@@ -263,7 +265,7 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
               children: [
                 // Status icon
                 Icon(_statusIcon, color: _statusColor, size: 24),
-                const SizedBox(width: 12),
+                const SizedBox(width: AppDimensions.spacingSmall),
 
                 // Event name and status
                 Expanded(
@@ -278,7 +280,7 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
                         maxLines: 1,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 4),
+                      const SizedBox(height: AppDimensions.spacingXSmall),
                       Text(
                         widget.application.statusDisplay,
                         style: Theme.of(context).textTheme.bodySmall?.copyWith(
@@ -303,7 +305,7 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
 
           // Application details
           Padding(
-            padding: const EdgeInsets.all(16),
+            padding: const EdgeInsets.all(AppDimensions.spacingMedium),
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
@@ -326,7 +328,7 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
                           size: 28,
                         ),
                       ),
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppDimensions.spacingSmall),
 
                       // Musician details
                       Expanded(
@@ -378,12 +380,12 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
                 // Application message if exists
                 if (widget.application.message != null &&
                     widget.application.message!.isNotEmpty) ...[
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppDimensions.spacingSmall),
                     decoration: BoxDecoration(
                       color: AppColors.greyLight.withValues(alpha: 0.3),
-                      borderRadius: BorderRadius.circular(8),
+                      borderRadius: BorderRadius.circular(AppDimensions.radiusSmall),
                     ),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
@@ -420,9 +422,9 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
                 if (widget.application.isRejected &&
                     widget.application.rejectionReason != null &&
                     widget.application.rejectionReason!.isNotEmpty) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Container(
-                    padding: const EdgeInsets.all(12),
+                    padding: const EdgeInsets.all(AppDimensions.spacingSmall),
                     decoration: BoxDecoration(
                       color: AppColors.error.withValues(alpha: 0.1),
                       borderRadius: BorderRadius.circular(8),
@@ -463,7 +465,7 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
 
                 // Action buttons (only for pending applications)
                 if (isPending) ...[
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
                   Row(
                     children: [
                       // Reject button
@@ -480,7 +482,7 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
                         ),
                       ),
 
-                      const SizedBox(width: 12),
+                      const SizedBox(width: AppDimensions.spacingSmall),
 
                       // Accept button
                       Expanded(
@@ -491,7 +493,7 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
                             width: 16,
                             height: 16,
                             child: CircularProgressIndicator(
-                              strokeWidth: 2,
+                              strokeWidth: AppDimensions.borderWidthThick,
                               color: AppColors.white,
                             ),
                           )
@@ -509,7 +511,7 @@ class _OrganizerApplicationCardState extends State<OrganizerApplicationCard>{
 
                 // Responded at date (for accepted/rejected)
                 if (!isPending && widget.application.respondedAt != null) ...[
-                  const SizedBox(height: 12),
+                  const SizedBox(height: AppDimensions.spacingSmall),
                   Row(
                     children: [
                       Icon(

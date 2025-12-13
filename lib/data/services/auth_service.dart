@@ -2,6 +2,10 @@ import 'package:firebase_auth/firebase_auth.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/app_user.dart';
 import '../models/user_role.dart';
+import '../../core/config/app_config.dart';
+import '../../core/exceptions/app_exception.dart';
+import '../../core/exceptions/firebase_exceptions.dart';
+import '../../core/services/logger_service.dart';
 
 // Authentication service for Firebase Auth operations
 class AuthService {
@@ -22,6 +26,10 @@ class AuthService {
     required UserRole role,
   }) async {
     try {
+      LoggerService.info(
+        'Starting registration for: $email, role: ${role.name}',
+        tag: 'AuthService',
+      );
       // Create Firebase Auth user
       final UserCredential credential = await _auth.createUserWithEmailAndPassword(
         email: email,
@@ -43,13 +51,13 @@ class AuthService {
       );
 
       // Save to Firestore - users collection
-      await _firestore.collection('users').doc(user.uid).set(appUser.toJson());
+      await _firestore.collection(AppConfig.usersCollection).doc(user.uid).set(appUser.toJson());
 
       // Create role-specific document with all required fields
       final now = DateTime.now();
 
       if (role == UserRole.musician) {
-        await _firestore.collection('musicians').doc(user.uid).set({
+        await _firestore.collection(AppConfig.musiciansCollection).doc(user.uid).set({
           'id': user.uid,
           'userId': user.uid,
           'artistName': username,  // Use registration username as initial artist name
@@ -64,7 +72,7 @@ class AuthService {
         });
       } else {
         // Create organizer document
-        await _firestore.collection('organizers').doc(user.uid).set({
+        await _firestore.collection(AppConfig.organizersCollection).doc(user.uid).set({
           'id': user.uid,
           'userId': user.uid,
           'organizerName': username,
@@ -80,12 +88,36 @@ class AuthService {
       }
 
       return appUser;
-    } on FirebaseAuthException catch (e) {
-      throw Exception(_handleAuthException(e));
-    } on FirebaseException catch (e) {
-      throw Exception('Database error: ${e.message ?? e.toString()}');
-    } catch (e) {
-      throw Exception('Registration failed: ${e.toString()}');
+    } on FirebaseAuthException catch (e, stackTrace) {
+      LoggerService.error(
+        'Registration failed - Auth error for: $email',
+        tag: 'AuthService',
+        exception: e,
+        stackTrace: stackTrace,
+      );
+      throw FirebaseExceptionHandler.handleAuthException(e);
+
+    } on FirebaseException catch(e, stackTrace){
+      LoggerService.error(
+        'Registration failed - Firestore error for: $email',
+        tag: 'AuthService',
+        exception: e,
+        stackTrace: stackTrace,
+      );
+      throw FirebaseExceptionHandler.handleFirestoreException(e);
+
+    } catch(e, stackTrace){
+      LoggerService.error(
+        'Registration failed - Unexpected error for: $email',
+        tag: 'AuthService',
+        exception: e,
+        stackTrace: stackTrace,
+      );
+      throw AuthException(
+        'Registration failed. Please try again',
+        originalException: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
@@ -95,6 +127,7 @@ class AuthService {
     required String password,
   }) async {
     try {
+      LoggerService.info('Attempting sign in for: $email', tag: 'AuthService');
       final UserCredential credential = await _auth.signInWithEmailAndPassword(
         email: email,
         password: password,
@@ -106,69 +139,94 @@ class AuthService {
       }
 
       // Get user data from Firestore
-      final doc = await _firestore.collection('users').doc(user.uid).get();
+      final doc = await _firestore.collection(AppConfig.usersCollection).doc(user.uid).get();
 
       if (!doc.exists) {
-        throw Exception('User profile not found. Please contact support.');
+        throw ProfileException('User profile not found. Please contact support.');
       }
 
       final data = doc.data();
       if (data == null) {
-        throw Exception('User data is empty. Please contact support.');
+        throw ProfileException('User data is empty. Please contact support.');
       }
 
+      LoggerService.success('Sign in successful for: $email', tag: 'AuthService');
       return AppUser.fromJson(data);
-    } on FirebaseAuthException catch (e) {
-      throw Exception(_handleAuthException(e));
-    } on FirebaseException catch (e) {
-      throw Exception('Database error: ${e.message ?? e.toString()}');
-    } catch (e) {
-      if (e is Exception) rethrow;
-      throw Exception('Sign in failed: ${e.toString()}');
+    } on FirebaseAuthException catch (e, stackTrace) {
+      LoggerService.error(
+        'Sign in failed - Auth error for: $email',
+        tag: 'AuthService',
+        exception: e,
+        stackTrace: stackTrace,
+      );
+      throw FirebaseExceptionHandler.handleAuthException(e);
+    } on FirebaseException catch (e, stackTrace) {
+      LoggerService.error(
+        'Sign in failed - Firestore error for: $email',
+        tag: 'AuthService',
+        exception: e,
+        stackTrace: stackTrace,
+      );
+      throw FirebaseExceptionHandler.handleFirestoreException(e);
+    } on ProfileException {
+      // Re-throw ProfileException as-is
+      rethrow;
+    } catch (e, stackTrace) {
+      LoggerService.error(
+        'Sign in failed - Unexpected error for: $email',
+        tag: 'AuthService',
+        exception: e,
+        stackTrace: stackTrace,
+      );
+      throw AuthException(
+        'Sign in failed. Please try again.',
+        originalException: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
   // Sign out
   Future<void> signOut() async {
     try {
+      LoggerService.info('User signing out', tag: 'AuthService');
       await _auth.signOut();
-    } catch (e) {
-      throw Exception('Sign out failed: ${e.toString()}');
+      LoggerService.success('Sign out successful', tag: 'AuthService');
+      } catch (e, stackTrace) {
+      LoggerService.error(
+        'Sign out failed',
+        tag: 'AuthService',
+        exception: e,
+        stackTrace: stackTrace,
+      );
+      throw AuthException(
+        'Failed to sign out. Please try again.',
+        originalException: e,
+        stackTrace: stackTrace,
+      );
     }
   }
 
   // Get user data from Firestore
   Future<AppUser?> getUserData(String uid) async {
     try {
-      final doc = await _firestore.collection('users').doc(uid).get();
-      if (!doc.exists) return null;
-      return AppUser.fromJson(doc.data()!);
-    } catch (e) {
-      return null;
-    }
-  }
+      LoggerService.info('Fetching user data for: $uid', tag: 'AuthService');
+      final doc = await _firestore.collection(AppConfig.usersCollection).doc(uid).get();
 
-  /// Handle Firebase Auth exceptions
-  String _handleAuthException(FirebaseAuthException e) {
-    switch (e.code) {
-      case 'weak-password':
-        return 'The password is too weak';
-      case 'email-already-in-use':
-        return 'An account already exists with this email';
-      case 'invalid-email':
-        return 'The email address is invalid';
-      case 'user-not-found':
-        return 'No user found with this email';
-      case 'wrong-password':
-        return 'Incorrect password';
-      case 'user-disabled':
-        return 'This account has been disabled';
-      case 'too-many-requests':
-        return 'Too many attempts. Please try again later';
-      case 'operation-not-allowed':
-        return 'This operation is not allowed';
-      default:
-        return 'Authentication error: ${e.message}';
+      if (!doc.exists) {
+        LoggerService.warning('User data not found for: $uid', tag: 'AuthService');
+        return null;
+      }
+
+      return AppUser.fromJson(doc.data()!);
+    } catch (e, stackTrace) {
+      LoggerService.error(
+        'Failed to get user data for: $uid',
+        tag: 'AuthService',
+        exception: e,
+        stackTrace: stackTrace,
+      );
+      return null;
     }
   }
 }

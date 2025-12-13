@@ -7,7 +7,9 @@ import '../../../core/utils/validators.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../../data/services/event_service.dart';
 import '../../../data/models/event.dart';
-import '../../../data/models/music_post.dart';
+import '../../../core/constants/app_dimensions.dart';
+import '../../../core/constants/app_limits.dart';
+import '../../../core/config/app_config.dart';
 
 /// Create Event Screen for organizers
 class CreateEventScreen extends StatefulWidget {
@@ -243,6 +245,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             const SnackBar(
               content: Text('Event updated successfully!'),
               backgroundColor: AppColors.success,
+              duration: Duration(seconds: AppLimits.successSnackbarDurationSeconds),
             ),
           );
         }
@@ -254,6 +257,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
             const SnackBar(
               content: Text('Event created successfully!'),
               backgroundColor: AppColors.success,
+              duration: Duration(seconds: AppLimits.successSnackbarDurationSeconds),
             ),
           );
         }
@@ -282,6 +286,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       SnackBar(
         content: Text(message),
         backgroundColor: AppColors.error,
+        duration: Duration(seconds: AppLimits.errorSnackbarDurationSeconds),
       ),
     );
   }
@@ -300,7 +305,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
       body: AppBackground(
         child: SafeArea(
           child: SingleChildScrollView(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.all(AppDimensions.spacingLarge),
             child: Form(
               key: _formKey,
               child: Column(
@@ -317,7 +322,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     validator: Validators.required,
                     textInputAction: TextInputAction.next,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Venue Name
                   TextFormField(
@@ -330,7 +335,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     validator: Validators.required,
                     textInputAction: TextInputAction.next,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Location/Address
                   TextFormField(
@@ -344,7 +349,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     maxLines: 2,
                     textInputAction: TextInputAction.next,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Event Date
                   InkWell(
@@ -366,7 +371,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Start and End Time
                   Row(
@@ -416,7 +421,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       ),
                     ],
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Payment Type
                   DropdownButtonFormField<String>(
@@ -435,7 +440,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       setState(() => _paymentType = value!);
                     },
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Payment Amount (only show if Paid)
                   if (_paymentType == 'Paid') ...[
@@ -460,7 +465,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       },
                       textInputAction: TextInputAction.next,
                     ),
-                    const SizedBox(height: 16),
+                    const SizedBox(height: AppDimensions.spacingMedium),
                   ],
 
                   // Number of Slots
@@ -484,7 +489,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     },
                     textInputAction: TextInputAction.next,
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Genres
                   InkWell(
@@ -495,8 +500,8 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                         prefixIcon: Icon(Icons.music_note),
                       ),
                       child: Wrap(
-                        spacing: 8,
-                        runSpacing: 8,
+                        spacing: AppDimensions.spacingSmall,
+                        runSpacing: AppDimensions.spacingSmall,
                         children: _selectedGenres.isEmpty
                             ? [
                           Text(
@@ -519,7 +524,7 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                       ),
                     ),
                   ),
-                  const SizedBox(height: 16),
+                  const SizedBox(height: AppDimensions.spacingMedium),
 
                   // Description
                   TextFormField(
@@ -534,19 +539,19 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
                     validator: Validators.required,
                     textInputAction: TextInputAction.done,
                   ),
-                  const SizedBox(height: 32),
+                  const SizedBox(height: AppDimensions.spacingXLarge),
 
                   // Save Button
                   SizedBox(
-                    height: 56,
+                    height: AppDimensions.buttonHeight,
                     child: ElevatedButton(
                       onPressed: _isLoading ? null : _saveEvent,
                       child: _isLoading
                           ? const SizedBox(
-                        height: 24,
-                        width: 24,
+                        height: AppDimensions.iconMedium,
+                        width: AppDimensions.iconMedium,
                         child: CircularProgressIndicator(
-                          strokeWidth: 2,
+                          strokeWidth: AppDimensions.progressIndicatorStroke,
                           color: AppColors.white,
                         ),
                       )
@@ -594,7 +599,7 @@ class _GenreSelectionDialogState extends State<_GenreSelectionDialog> {
       content: SingleChildScrollView(
         child: Column(
           mainAxisSize: MainAxisSize.min,
-          children: MusicGenres.genres.where((g) => g != 'Not Tagged').map((genre) {
+          children: AppConfig.supportedGenres.where((g) => g != 'Not Tagged').map((genre) {
             final isSelected = _selected.contains(genre);
             return CheckboxListTile(
               title: Text(genre),

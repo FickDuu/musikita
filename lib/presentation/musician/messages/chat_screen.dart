@@ -4,6 +4,9 @@ import '../../../core/constants/app_colors.dart';
 import '../../../data/models/conversation.dart';
 import '../../../data/models/message.dart';
 import '../../../data/services/messaging_service.dart';
+import '../../../core/constants/app_dimensions.dart';
+import '../../../core/constants/app_limits.dart';
+
 
 /// Chat screen for one-on-one conversations
 class ChatScreen extends StatefulWidget {
@@ -79,6 +82,7 @@ class _ChatScreenState extends State<ChatScreen> {
           SnackBar(
             content: Text('Failed to send message: ${e.toString()}'),
             backgroundColor: AppColors.error,
+            duration: Duration(seconds: AppLimits.errorSnackbarDurationSeconds),
           ),
         );
       }
@@ -96,7 +100,7 @@ class _ChatScreenState extends State<ChatScreen> {
         title: Row(
           children: [
             _buildAvatar(),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingSmall),
             Expanded(
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
@@ -136,7 +140,7 @@ class _ChatScreenState extends State<ChatScreen> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         const Icon(Icons.error_outline, size: 48, color: AppColors.error),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppDimensions.spacingMedium),
                         Text('Error loading messages', style: Theme.of(context).textTheme.titleMedium),
                       ],
                     ),
@@ -155,14 +159,14 @@ class _ChatScreenState extends State<ChatScreen> {
                           size: 64,
                           color: AppColors.grey.withValues(alpha: 0.5),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: AppDimensions.spacingMedium),
                         Text(
                           'No messages yet',
                           style: Theme.of(context).textTheme.titleMedium?.copyWith(
                             color: AppColors.grey,
                           ),
                         ),
-                        const SizedBox(height: 8),
+                        const SizedBox(height: AppDimensions.spacingSmall),
                         Text(
                           'Send a message to start the conversation!',
                           style: Theme.of(context).textTheme.bodyMedium?.copyWith(
@@ -183,7 +187,7 @@ class _ChatScreenState extends State<ChatScreen> {
 
                 return ListView.builder(
                   controller: _scrollController,
-                  padding: const EdgeInsets.all(16),
+                  padding: const EdgeInsets.all(AppDimensions.spacingMedium),
                   itemCount: messages.length,
                   itemBuilder: (context, index) {
                     final message = messages[index];
@@ -248,7 +252,7 @@ class _ChatScreenState extends State<ChatScreen> {
           ),
         ],
       ),
-      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+      padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingMedium, vertical: AppDimensions.spacingSmall),
       child: SafeArea(
         child: Row(
           children: [
@@ -271,7 +275,7 @@ class _ChatScreenState extends State<ChatScreen> {
                   ),
                   contentPadding: const EdgeInsets.symmetric(
                     horizontal: 20,
-                    vertical: 12,
+                    vertical: AppDimensions.spacingSmall,
                   ),
                 ),
                 maxLines: null,
@@ -279,7 +283,7 @@ class _ChatScreenState extends State<ChatScreen> {
                 onSubmitted: (_) => _sendMessage(),
               ),
             ),
-            const SizedBox(width: 12),
+            const SizedBox(width: AppDimensions.spacingSmall),
             FloatingActionButton(
               onPressed: _isSending ? null : _sendMessage,
               backgroundColor: _isSending ? AppColors.grey : AppColors.primary,
@@ -287,17 +291,17 @@ class _ChatScreenState extends State<ChatScreen> {
               elevation: 0,
               child: _isSending
                   ? const SizedBox(
-                height: 20,
-                width: 20,
+                height: AppDimensions.iconSmall,
+                width: AppDimensions.iconSmall,
                 child: CircularProgressIndicator(
-                  strokeWidth: 2,
+                  strokeWidth: AppDimensions.progressIndicatorStroke,
                   color: AppColors.white,
                 ),
               )
                   : const Icon(
                 Icons.send,
                 color: AppColors.white,
-                size: 20,
+                size: AppDimensions.iconSmall,
               ),
             ),
           ],
@@ -342,13 +346,13 @@ class _ChatScreenState extends State<ChatScreen> {
     }
 
     return Padding(
-      padding: const EdgeInsets.symmetric(vertical: 16),
+      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingMedium),
       child: Center(
         child: Container(
-          padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
+          padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingMedium, vertical: 6),
           decoration: BoxDecoration(
             color: AppColors.greyLight,
-            borderRadius: BorderRadius.circular(12),
+            borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
           ),
           child: Text(
             text,
@@ -377,14 +381,14 @@ class _MessageBubble extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.only(bottom: 12),
+      padding: const EdgeInsets.only(bottom: AppDimensions.spacingSmall),
       child: Row(
         mainAxisAlignment: isMe ? MainAxisAlignment.end : MainAxisAlignment.start,
         crossAxisAlignment: CrossAxisAlignment.end,
         children: [
           if (!isMe) ...[
             CircleAvatar(
-              radius: 16,
+              radius: AppDimensions.avatarRadiusSmall,
               backgroundColor: AppColors.primary.withValues(alpha: 0.1),
               child: Text(
                 message.senderName[0].toUpperCase(),
@@ -395,18 +399,18 @@ class _MessageBubble extends StatelessWidget {
                 ),
               ),
             ),
-            const SizedBox(width: 8),
+            const SizedBox(width: AppDimensions.spacingSmall),
           ],
           Flexible(
             child: Container(
-              padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+              padding: const EdgeInsets.symmetric(horizontal: AppDimensions.spacingMedium, vertical: 10),
               decoration: BoxDecoration(
                 color: isMe ? AppColors.primary : AppColors.greyLight,
                 borderRadius: BorderRadius.only(
-                  topLeft: const Radius.circular(16),
-                  topRight: const Radius.circular(16),
-                  bottomLeft: Radius.circular(isMe ? 16 : 4),
-                  bottomRight: Radius.circular(isMe ? 4 : 16),
+                  topLeft: const Radius.circular(AppDimensions.radiusLarge),
+                  topRight: const Radius.circular(AppDimensions.radiusLarge),
+                  bottomLeft: Radius.circular(isMe ? AppDimensions.radiusLarge : 4),
+                  bottomRight: Radius.circular(isMe ? 4 : AppDimensions.radiusLarge),
                 ),
               ),
               child: Column(
@@ -419,7 +423,7 @@ class _MessageBubble extends StatelessWidget {
                       fontSize: 15,
                     ),
                   ),
-                  const SizedBox(height: 4),
+                  const SizedBox(height: AppDimensions.spacingXSmall),
                   Text(
                     DateFormat('h:mm a').format(message.timestamp),
                     style: TextStyle(
