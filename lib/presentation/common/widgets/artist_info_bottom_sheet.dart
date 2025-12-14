@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../data/services/messaging_service.dart';
-import '../../../data/models/conversation.dart';
-import '../../shared/messaging/chat_screen.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_routes.dart';
 import '../../../data/models/musician.dart';
 import 'package:musikita/data/providers/auth_provider.dart';
 import 'package:musikita/core/constants/app_dimensions.dart';
@@ -173,38 +173,43 @@ class ArtistInfoBottomSheet extends StatelessWidget {
           ],
 
           // Action buttons
-          Row(
-            children: [
-              // View Profile button
-              Expanded(
-                child: ElevatedButton(
-                  onPressed: () {
-                    Navigator.pop(context);
-                    onViewProfile();
-                  },
-                  style: ElevatedButton.styleFrom(
-                    backgroundColor: AppColors.primary,
-                    foregroundColor: Colors.white,
-                    padding: const EdgeInsets.symmetric(vertical: AppDimensions.buttonPaddingVertical),
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+          Builder(
+            builder: (context) {
+              final authProvider = Provider.of<AuthProvider>(context, listen: false);
+              final isOwnProfile = authProvider.userId == musician.userId;
+
+              return Row(
+                children: [
+                  // View Profile button
+                  Expanded(
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.pop(context);
+                        onViewProfile();
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: AppColors.primary,
+                        foregroundColor: Colors.white,
+                        padding: const EdgeInsets.symmetric(vertical: AppDimensions.buttonPaddingVertical),
+                        shape: RoundedRectangleBorder(
+                          borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
+                        ),
+                      ),
+                      child: const Text(
+                        'View Full Profile',
+                        style: TextStyle(
+                          fontWeight: FontWeight.w600,
+                          fontSize: AppDimensions.fontMedium,
+                        ),
+                      ),
                     ),
                   ),
-                  child: const Text(
-                    'View Full Profile',
-                    style: TextStyle(
-                      fontWeight: FontWeight.w600,
-                      fontSize: AppDimensions.fontMedium,
-                    ),
-                  ),
-                ),
-              ),
 
-              const SizedBox(width: AppDimensions.radiusMedium),
-
-              // Message button
-              Expanded(
-                child: OutlinedButton(
+                  // Message button (only show if not own profile)
+                  if (!isOwnProfile) ...[
+                    const SizedBox(width: AppDimensions.radiusMedium),
+                    Expanded(
+                      child: OutlinedButton(
                   onPressed: () async {
                         Navigator.pop(context);
                         //_showComingSoonMessage(context);
@@ -221,7 +226,7 @@ class ArtistInfoBottomSheet extends StatelessWidget {
                           if (currentUser == null) return;
 
                           final messagingService = MessagingService();
-                          final conversationId = await messagingService.getOrCreateConversation(
+                          await messagingService.getOrCreateConversation(
                             currentUserId: currentUser.uid,
                             otherUserId: musician.userId,
                             currentUserName: currentUser.username,
@@ -236,15 +241,8 @@ class ArtistInfoBottomSheet extends StatelessWidget {
                           );
 
                           if (context.mounted) {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => ChatScreen(
-                                      conversationId: conversationId,
-                                      currentUserId: currentUser.uid,
-                                    ),
-                              ),
-                            );
+                            // Navigate to Messages page to see the new conversation
+                            context.go(AppRoutes.messages);
                           }
                         }
                         catch (e) {
@@ -275,8 +273,11 @@ class ArtistInfoBottomSheet extends StatelessWidget {
                     ),
                   ),
                 ),
-              ),
-            ],
+                    ),
+                  ],
+                ],
+              );
+            },
           ),
 
           // Bottom padding for safe area

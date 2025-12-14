@@ -31,7 +31,6 @@ class _ChatScreenState extends State<ChatScreen> {
 
   bool _isSending = false;
   bool _isLoadingConversation = true;
-  Conversation? _conversation;
   ParticipantDetail? _otherUser;
   String? _otherUserId;
 
@@ -48,7 +47,6 @@ class _ChatScreenState extends State<ChatScreen> {
       final conversation = await _messagingService.getConversation(widget.conversationId);
       if (conversation != null && mounted) {
         setState(() {
-          _conversation = conversation;
           _otherUser = conversation.getOtherParticipant(widget.currentUserId);
           _otherUserId = conversation.getOtherParticipantId(widget.currentUserId);
           _isLoadingConversation = false;
@@ -279,12 +277,12 @@ class _ChatScreenState extends State<ChatScreen> {
     return CircleAvatar(
       backgroundColor: _otherUser!.role == 'musician'
           ? AppColors.primary.withValues(alpha: 0.1)
-          : AppColors.secondary.withValues(alpha: 0.1),
+          : AppColors.primary.withValues(alpha: 0.1),
       radius: 18,
       child: Text(
         _otherUser!.name[0].toUpperCase(),
         style: TextStyle(
-          color: _otherUser!.role == 'musician' ? AppColors.primary : AppColors.secondary,
+          color: _otherUser!.role == 'musician' ? AppColors.primary : AppColors.primary,
           fontWeight: FontWeight.bold,
           fontSize: 16,
         ),

@@ -1,8 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../../core/constants/app_colors.dart';
+import '../../../../core/constants/app_routes.dart';
 import '../../../../data/models/event.dart';
 import '../../../../data/services/event_service.dart';
+import '../../../../data/services/messaging_service.dart';
 import 'package:provider/provider.dart';
 import '../../../../data/providers/auth_provider.dart';
 import 'package:musikita/core/constants/app_dimensions.dart';
@@ -29,7 +32,12 @@ class _EventCardState extends State<EventCard> {
   bool _isApplying = false;
 
   Future<void> _applyToEvent() async {
-    // Show confirmation dialog first
+    // Get user name before async operations
+    final authProvider = Provider.of<AuthProvider>(context, listen: false);
+    final currentUser = authProvider.appUser;
+    final musicianName = currentUser?.username ?? 'Unknown Musician';
+
+    // Show confirmation dialog
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
@@ -69,10 +77,6 @@ class _EventCardState extends State<EventCard> {
     setState(() => _isApplying = true);
 
     try {
-      // Get user name from auth or use placeholder
-      final authProvider = Provider.of<AuthProvider>(context, listen: false);
-      final currentUser = authProvider.appUser;
-      final musicianName = currentUser?.username ?? 'Unknown Musician';
 
       await _eventService.applyToEvent(
         eventId: widget.event.id,
@@ -106,6 +110,116 @@ class _EventCardState extends State<EventCard> {
         setState(() => _isApplying = false);
       }
     }
+  }
+
+  void _showOrganizerOptions() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      backgroundColor: Colors.transparent,
+      builder: (context) => Container(
+        decoration: const BoxDecoration(
+          color: Colors.white,
+          borderRadius: BorderRadius.vertical(top: Radius.circular(AppDimensions.radiusXLarge)),
+        ),
+        padding: const EdgeInsets.all(AppDimensions.dialogPadding),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          children: [
+            // Drag handle
+            Container(
+              width: AppDimensions.bottomSheetHandleWidth,
+              height: AppDimensions.bottomSheetHandleHeight,
+              margin: const EdgeInsets.only(bottom: AppDimensions.spacingMedium),
+              decoration: BoxDecoration(
+                color: AppColors.grey.withValues(alpha: 0.3),
+                borderRadius: BorderRadius.circular(AppDimensions.spacingXSmall / 2),
+              ),
+            ),
+
+            // Organizer name header
+            Text(
+              widget.event.organizerName,
+              style: Theme.of(context).textTheme.titleLarge?.copyWith(
+                fontWeight: FontWeight.bold,
+              ),
+            ),
+            const SizedBox(height: AppDimensions.spacingMedium),
+
+            // Action buttons
+            Row(
+              children: [
+                // View Profile button
+                Expanded(
+                  child: ElevatedButton.icon(
+                    onPressed: () {
+                      Navigator.pop(context);
+                      context.push(AppRoutes.organizerProfilePath(widget.event.organizerId));
+                    },
+                    icon: const Icon(Icons.person),
+                    label: const Text('View Profile'),
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: AppColors.primary,
+                      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingMedium),
+                    ),
+                  ),
+                ),
+                const SizedBox(width: AppDimensions.spacingMedium),
+
+                // Message button
+                Expanded(
+                  child: OutlinedButton.icon(
+                    onPressed: () async {
+                      Navigator.pop(context);
+                      final authProvider = Provider.of<AuthProvider>(context, listen: false);
+                      final currentUser = authProvider.appUser;
+
+                      if (currentUser == null) return;
+
+                      try {
+                        final messagingService = MessagingService();
+                        await messagingService.getOrCreateConversation(
+                          currentUserId: currentUser.uid,
+                          otherUserId: widget.event.organizerId,
+                          currentUserName: currentUser.username,
+                          currentUserRole: 'musician',
+                          otherUserName: widget.event.organizerName,
+                          otherUserRole: 'organizer',
+                          currentUserImageUrl: currentUser.profileImageUrl,
+                          otherUserImageUrl: null,
+                        );
+
+                        if (context.mounted) {
+                          context.go(AppRoutes.messages);
+                        }
+                      } catch (e) {
+                        if (context.mounted) {
+                          ScaffoldMessenger.of(context).showSnackBar(
+                            SnackBar(
+                              content: Text('Failed to start conversation: ${e.toString()}'),
+                              backgroundColor: AppColors.error,
+                            ),
+                          );
+                        }
+                      }
+                    },
+                    icon: const Icon(Icons.message),
+                    label: const Text('Message'),
+                    style: OutlinedButton.styleFrom(
+                      foregroundColor: AppColors.primary,
+                      side: const BorderSide(color: AppColors.primary, width: 2),
+                      padding: const EdgeInsets.symmetric(vertical: AppDimensions.spacingMedium),
+                    ),
+                  ),
+                ),
+              ],
+            ),
+
+            SizedBox(height: MediaQuery.of(context).padding.bottom + AppDimensions.spacingMedium),
+          ],
+        ),
+      ),
+    );
   }
 
   @override
@@ -215,6 +329,37 @@ class _EventCardState extends State<EventCard> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
+                // Organizer name (clickable) - matching organizer card design
+                GestureDetector(
+                  onTap: _showOrganizerOptions,
+                  child: Row(
+                    children: [
+                      const Icon(
+                        Icons.business,
+                        size: 18,
+                        color: AppColors.primary,
+                      ),
+                      const SizedBox(width: 8),
+                      Expanded(
+                        child: Text(
+                          'by ${widget.event.organizerName}',
+                          style: Theme.of(context).textTheme.bodyMedium?.copyWith(
+                            color: AppColors.primary,
+                            fontWeight: FontWeight.w600,
+                            decoration: TextDecoration.underline,
+                          ),
+                        ),
+                      ),
+                      const Icon(
+                        Icons.info_outline,
+                        size: 14,
+                        color: AppColors.primary,
+                      ),
+                    ],
+                  ),
+                ),
+                const SizedBox(height: AppDimensions.spacingSmall),
+
                 // Time
                 _buildInfoRow(
                   Icons.access_time,

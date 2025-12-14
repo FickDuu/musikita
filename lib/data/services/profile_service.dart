@@ -2,7 +2,6 @@ import 'dart:io';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_storage/firebase_storage.dart';
 import 'package:musikita/core/config/app_config.dart';
-import 'package:musikita/core/constants/app_limits.dart';
 import '../../core/exceptions/app_exception.dart';
 import '../../core/exceptions/firebase_exceptions.dart';
 import '../../core/services/logger_service.dart';
@@ -77,15 +76,48 @@ class ProfileService {
 
       await _firestore.collection(AppConfig.usersCollection).doc(userId).update(updates);
 
-      if(bio != null && bio.isNotEmpty){
-        final userDoc = await _firestore.collection(AppConfig.usersCollection).doc(userId).get();
-        final role = userDoc.data()?['role'] as String?;
+      // Get user role for additional updates
+      final userDoc = await _firestore.collection(AppConfig.usersCollection).doc(userId).get();
+      final role = userDoc.data()?['role'] as String?;
 
-        if(role == 'musician'){
-          await _firestore.collection(AppConfig.musiciansCollection).doc(userId).set({
-            'bio': bio,
-          }, SetOptions(merge: true));
-        }else if(role == 'organizer'){
+      // Update bio and username in role-specific collection
+      if(role == 'musician'){
+        final Map<String, dynamic> musicianUpdates = {};
+        if(bio != null && bio.isNotEmpty) musicianUpdates['bio'] = bio;
+        if(username != null) musicianUpdates['artistName'] = username;
+
+        if(musicianUpdates.isNotEmpty) {
+          await _firestore.collection(AppConfig.musiciansCollection).doc(userId).set(
+            musicianUpdates,
+            SetOptions(merge: true),
+          );
+        }
+
+        // Update artistName in all music posts for this user
+        if(username != null) {
+          LoggerService.info(
+            'Updating artistName in all music posts for user: $userId',
+            tag: 'ProfileService',
+          );
+
+          final musicPosts = await _firestore
+              .collection(AppConfig.musicPostsCollection)
+              .where('userId', isEqualTo: userId)
+              .get();
+
+          final batch = _firestore.batch();
+          for (var doc in musicPosts.docs) {
+            batch.update(doc.reference, {'artistName': username});
+          }
+          await batch.commit();
+
+          LoggerService.success(
+            'Updated ${musicPosts.docs.length} music posts with new artistName',
+            tag: 'ProfileService',
+          );
+        }
+      }else if(role == 'organizer'){
+        if(bio != null && bio.isNotEmpty) {
           await _firestore.collection(AppConfig.organizersCollection).doc(userId).set({
             'bio': bio,
           }, SetOptions(merge: true));

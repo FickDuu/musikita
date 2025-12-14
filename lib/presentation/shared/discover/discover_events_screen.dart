@@ -1,10 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_limits.dart';
+import '../../../core/constants/app_routes.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../core/services/logger_service.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../data/models/event.dart';
 import '../../../data/services/event_service.dart';
 import '../../../data/providers/auth_provider.dart';
@@ -41,7 +44,14 @@ class _DiscoverEventsScreenState extends State<DiscoverEventsScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Discover Events'),
+        title: const Text(
+          'Discover Events',
+          style: TextStyle(
+            fontFamily: AppTheme.artistUsernameFont,
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         automaticallyImplyLeading: false,
         actions: [
           // Filter button (musicians only)
@@ -53,6 +63,13 @@ class _DiscoverEventsScreenState extends State<DiscoverEventsScreen> {
               ),
               onPressed: _showFilters,
             ),
+          // Notification button
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () {
+              context.push(AppRoutes.notifications);
+            },
+          ),
         ],
       ),
       body: AppBackground(

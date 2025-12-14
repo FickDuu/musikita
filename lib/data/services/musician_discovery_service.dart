@@ -2,8 +2,6 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import '../models/musician.dart';
 import '../models/music_post.dart';
 import 'package:musikita/core/config/app_config.dart';
-import '../../core/exceptions/app_exception.dart';
-import '../../core/exceptions/firebase_exceptions.dart';
 import '../../core/services/logger_service.dart';
 
 /// Service for discovering and browsing other musicians

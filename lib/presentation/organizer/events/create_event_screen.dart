@@ -48,7 +48,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   String _paymentType = 'Paid';
   List<String> _selectedGenres = [];
   bool _isLoading = false;
-  bool _isLoadingEvent = false;
   Event? _event;
 
   final List<String> _paymentTypes = ['Paid', 'Unpaid', 'Negotiable'];
@@ -72,8 +71,6 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
   }
 
   Future<void> _loadEventData() async {
-    setState(() => _isLoadingEvent = true);
-
     try {
       final event = await _eventService.getEventById(widget.eventId!);
       if (event != null && mounted) {
@@ -90,12 +87,10 @@ class _CreateEventScreenState extends State<CreateEventScreen> {
           _endTime = _parseTime(event.endTime);
           _paymentType = event.paymentType;
           _selectedGenres = List.from(event.genres);
-          _isLoadingEvent = false;
         });
       }
     } catch (e) {
       if (mounted) {
-        setState(() => _isLoadingEvent = false);
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(content: Text('Error loading event: $e')),
         );

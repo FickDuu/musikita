@@ -167,7 +167,7 @@ class NotificationCard extends StatelessWidget {
       case 'new_application':
         return AppColors.primary;
       case 'new_message':
-        return AppColors.secondary;
+        return AppColors.primaryLight;
       case 'event_reminder':
         return AppColors.warning;
       case 'event_cancelled':

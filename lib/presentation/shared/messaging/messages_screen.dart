@@ -1,6 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:go_router/go_router.dart';
 import 'package:intl/intl.dart';
 import '../../../core/constants/app_colors.dart';
+import '../../../core/constants/app_routes.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../data/models/conversation.dart';
 import '../../../data/services/messaging_service.dart';
 import 'chat_screen.dart';
@@ -26,8 +29,23 @@ class _MessagesScreenState extends State<MessagesScreen> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text('Messages'),
+        title: const Text(
+          'Messages',
+          style: TextStyle(
+            fontFamily: AppTheme.artistUsernameFont,
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () {
+              context.push(AppRoutes.notifications);
+            },
+          ),
+        ],
       ),
       body: StreamBuilder<List<Conversation>>(
         stream: _messagingService.getConversationsStream(widget.userId),
@@ -164,23 +182,26 @@ class _ConversationListItem extends StatelessWidget {
         maxLines: 1,
         overflow: TextOverflow.ellipsis,
       ),
-      trailing: Column(
-        mainAxisAlignment: MainAxisAlignment.center,
-        crossAxisAlignment: CrossAxisAlignment.end,
-        children: [
-          if (conversation.lastMessageTime != null)
-            Text(
-              _formatTimestamp(conversation.lastMessageTime!),
-              style: Theme.of(context).textTheme.bodySmall?.copyWith(
-                color: hasUnread ? AppColors.primary : AppColors.grey,
-                fontWeight: hasUnread ? FontWeight.w600 : FontWeight.normal,
+      trailing: SizedBox(
+        width: 80,
+        child: Column(
+          mainAxisAlignment: MainAxisAlignment.center,
+          crossAxisAlignment: CrossAxisAlignment.end,
+          children: [
+            if (conversation.lastMessageTime != null)
+              Text(
+                _formatTimestamp(conversation.lastMessageTime!),
+                style: Theme.of(context).textTheme.bodySmall?.copyWith(
+                  color: hasUnread ? AppColors.primary : AppColors.grey,
+                  fontWeight: hasUnread ? FontWeight.w600 : FontWeight.normal,
+                ),
               ),
-            ),
-          if (hasUnread) ...[
-            const SizedBox(height: AppDimensions.spacingXSmall),
-            _buildUnreadBadge(unreadCount),
+            if (hasUnread) ...[
+              const SizedBox(height: AppDimensions.spacingXSmall),
+              _buildUnreadBadge(unreadCount),
+            ],
           ],
-        ],
+        ),
       ),
     );
   }
@@ -196,12 +217,12 @@ class _ConversationListItem extends StatelessWidget {
     return CircleAvatar(
       backgroundColor: participant.role == 'musician'
           ? AppColors.primary.withValues(alpha: .1)
-          : AppColors.secondary.withValues(alpha: .1),
+          : AppColors.primary.withValues(alpha: .1),
       radius: AppDimensions.avatarRadiusMedium,
       child: Text(
         participant.name[0].toUpperCase(),
         style: TextStyle(
-          color: participant.role == 'musician' ? AppColors.primary : AppColors.secondary,
+          color: participant.role == 'musician' ? AppColors.primary : AppColors.primary,
           fontWeight: FontWeight.bold,
           fontSize: 20,
         ),
@@ -215,7 +236,7 @@ class _ConversationListItem extends StatelessWidget {
       decoration: BoxDecoration(
         color: role == 'musician'
             ? AppColors.primary.withValues(alpha: 0.1)
-            : AppColors.secondary.withValues(alpha: 0.1),
+            : AppColors.primary.withValues(alpha: 0.1),
         borderRadius: BorderRadius.circular(AppDimensions.radiusMedium),
       ),
       child: Text(
@@ -223,7 +244,7 @@ class _ConversationListItem extends StatelessWidget {
         style: TextStyle(
           fontSize: 10,
           fontWeight: FontWeight.w600,
-          color: role == 'musician' ? AppColors.primary : AppColors.secondary,
+          color: role == 'musician' ? AppColors.primary : AppColors.primary,
         ),
       ),
     );

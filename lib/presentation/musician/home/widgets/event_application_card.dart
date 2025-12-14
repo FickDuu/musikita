@@ -25,7 +25,6 @@ class EventApplicationCard extends StatefulWidget {
 
 class _EventApplicationCardState extends State<EventApplicationCard>{
   final _eventService = EventService();
-  bool _isProcessing = false;
 
   Color get _borderColor{
     switch(widget.status){
@@ -103,7 +102,6 @@ class _EventApplicationCardState extends State<EventApplicationCard>{
     );
 
     if (confirmed != true) return;
-    setState(() => _isProcessing = true);
 
     try{
       await _eventService.cancelApplication(widget.application.id);
@@ -125,12 +123,6 @@ class _EventApplicationCardState extends State<EventApplicationCard>{
             backgroundColor: AppColors.error,
           ),
         );
-      }
-    }
-
-    finally{
-      if(mounted){
-        setState(() => _isProcessing = false);
       }
     }
   }

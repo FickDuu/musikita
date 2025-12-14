@@ -5,7 +5,6 @@ import '../../../../data/models/event_application.dart';
 import '../../../../data/services/event_service.dart';
 import '../../../musician/home/musician_home_screen.dart';
 import '../../../../core/constants/app_dimensions.dart';
-import '../../../../core/constants/app_limits.dart';
 
 //organizer application card to display musician application
 class OrganizerApplicationCard extends StatefulWidget{

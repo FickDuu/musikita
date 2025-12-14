@@ -6,7 +6,6 @@ import '../../../core/constants/app_colors.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../../data/services/music_service.dart';
-import '../../../data/models/music_post.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_limits.dart';
 import '../../../core/config/app_config.dart';

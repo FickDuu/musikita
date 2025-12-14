@@ -75,12 +75,11 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     }
   }
 
-  void _onFabTapped(BuildContext context) {
+  void _onAddTapped(BuildContext context) {
     final authProvider = context.read<AuthProvider>();
     final userRole = authProvider.userRole;
-    final userId = authProvider.userId ?? '';
 
-    LoggerService.debug('FAB tapped: role=$userRole', tag: _tag);
+    LoggerService.debug('Add button tapped: role=$userRole', tag: _tag);
 
     if (userRole == 'musician') {
       // Navigate to post music screen for musicians
@@ -91,6 +90,33 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
     }
   }
 
+  Widget _buildAddButton(BuildContext context, String? userRole) {
+    return Expanded(
+      child: InkWell(
+        onTap: () => _onAddTapped(context),
+        child: Column(
+          mainAxisSize: MainAxisSize.min,
+          mainAxisAlignment: MainAxisAlignment.center,
+          children: [
+            Container(
+              padding: const EdgeInsets.all(6),
+              decoration: BoxDecoration(
+                color: AppColors.primary,
+                borderRadius: BorderRadius.circular(8),
+              ),
+              child: const Icon(
+                Icons.add,
+                color: AppColors.white,
+                size: 24,
+              ),
+            ),
+            const SizedBox(height: 0),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     final authProvider = context.watch<AuthProvider>();
@@ -99,20 +125,8 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
 
     return Scaffold(
       body: widget.child,
-      floatingActionButton: FloatingActionButton(
-        onPressed: () => _onFabTapped(context),
-        backgroundColor: AppColors.primary,
-        child: const Icon(
-          Icons.add,
-          color: AppColors.white,
-          size: 32,
-        ),
-      ),
-      floatingActionButtonLocation: FloatingActionButtonLocation.centerDocked,
       bottomNavigationBar: BottomAppBar(
         color: AppColors.surface,
-        shape: const CircularNotchedRectangle(),
-        notchMargin: 8.0,
         height: AppDimensions.bottomNavHeight,
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 4.0, vertical: 4.0),
@@ -135,7 +149,7 @@ class _MainNavigationShellState extends State<MainNavigationShell> {
               index: 1,
               selectedIndex: selectedIndex,
             ),
-            const SizedBox(width: 40), // Space for FAB
+            _buildAddButton(context, userRole),
             _buildNavItem(
               context: context,
               icon: Icons.message_outlined,

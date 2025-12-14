@@ -1,12 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:go_router/go_router.dart';
 import 'package:provider/provider.dart';
 import '../../../core/constants/app_colors.dart';
 import '../../../core/constants/app_dimensions.dart';
 import '../../../core/constants/app_limits.dart';
+import '../../../core/constants/app_routes.dart';
 import '../../../core/config/app_config.dart';
 import '../../../core/widgets/app_background.dart';
 import '../../../core/services/logger_service.dart';
+import '../../../core/theme/app_theme.dart';
 import '../../../data/models/music_post.dart';
 import '../../../data/providers/auth_provider.dart';
 import '../../musician/home/widgets/music_player_card.dart';
@@ -40,8 +43,23 @@ class _DiscoverMusicScreenState extends State<DiscoverMusicScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text(title),
+        title: Text(
+          title,
+          style: const TextStyle(
+            fontFamily: AppTheme.artistUsernameFont,
+            fontSize: 24,
+            fontWeight: FontWeight.w600,
+          ),
+        ),
         automaticallyImplyLeading: false,
+        actions: [
+          IconButton(
+            icon: const Icon(Icons.notifications_outlined),
+            onPressed: () {
+              context.push(AppRoutes.notifications);
+            },
+          ),
+        ],
       ),
       body: AppBackground(
         child: _buildMusicFeed(userRole, userId),

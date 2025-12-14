@@ -32,6 +32,10 @@ class MusicPlayerCard extends StatefulWidget {
 }
 
 class _MusicPlayerCardState extends State<MusicPlayerCard> {
+  // Static reference to currently playing audio player
+  static AudioPlayer? _currentlyPlayingPlayer;
+  static _MusicPlayerCardState? _currentlyPlayingState;
+
   late AudioPlayer _audioPlayer;
   bool _isPlaying = false;
   bool _isLoading = false;
@@ -92,6 +96,11 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
 
   @override
   void dispose() {
+    // Clear static reference if this is the currently playing player
+    if (_currentlyPlayingPlayer == _audioPlayer) {
+      _currentlyPlayingPlayer = null;
+      _currentlyPlayingState = null;
+    }
     _audioPlayer.dispose();
     super.dispose();
   }
@@ -101,11 +110,29 @@ class _MusicPlayerCardState extends State<MusicPlayerCard> {
       if (_isPlaying) {
         await _audioPlayer.pause();
       } else {
+        // Stop any currently playing audio player
+        if (_currentlyPlayingPlayer != null && _currentlyPlayingPlayer != _audioPlayer) {
+          await _currentlyPlayingPlayer!.pause();
+          await _currentlyPlayingPlayer!.seek(Duration.zero);
+          // Update the state of the previously playing card
+          if (_currentlyPlayingState != null && _currentlyPlayingState!.mounted) {
+            _currentlyPlayingState!.setState(() {
+              _currentlyPlayingState!._isPlaying = false;
+              _currentlyPlayingState!._position = Duration.zero;
+            });
+          }
+        }
+
         // If not yet loaded or completed, load and play from start
         if (_audioPlayer.processingState == ProcessingState.idle ||
             _audioPlayer.processingState == ProcessingState.completed) {
           await _audioPlayer.setUrl(widget.musicPost.audioUrl);
         }
+
+        // Set this as the currently playing player
+        _currentlyPlayingPlayer = _audioPlayer;
+        _currentlyPlayingState = this;
+
         await _audioPlayer.play();
       }
     } catch (e) {
