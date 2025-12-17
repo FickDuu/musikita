@@ -96,7 +96,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
         title: const Text(AppStrings.signUp),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
-          onPressed: () => context.pop(),
+          onPressed: () => context.go(AppRoutes.login),
         ),
       ),
       body: AppBackground(
@@ -208,7 +208,7 @@ class _RegisterScreenState extends State<RegisterScreen> {
                   ),
                   const SizedBox(height: AppDimensions.spacingXLarge),
 
-                  // Register Button
+                  // Sign up Button
                   SizedBox(
                     height: AppDimensions.buttonHeightLarge,
                     child: ElevatedButton(
